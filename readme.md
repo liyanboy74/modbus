@@ -31,7 +31,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 
-Usage:
+Usage Example:
 
 ```c
 //Global
@@ -91,9 +91,6 @@ if(MB_UART_STATE==MB_UART_READY)
                 case MB_Read_Input_Registers:
                     Addres=(mb_rx_buffer[i][2]<<8)|(mb_rx_buffer[i][3]);
                     Len=(mb_rx_buffer[i][4]<<8)|(mb_rx_buffer[i][5]);
-
-                    ADC_Sample_All();
-                    memset(data,0,Len*2);
 
                     for(k=0,j=Addres;(j<(Addres+Len))&&(Addres+Len<=8);j++)
                     {
