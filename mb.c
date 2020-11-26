@@ -25,7 +25,6 @@ void mb_uart_reset_char_listen(UART_HandleTypeDef *huart)
 //--------------------- TIM INTRUPT ----------------------------------
 void mb_tim_periodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	htim->Instance->CNT=0x8000;
 	if(MB_UART_STATE!=MB_UART_LISTEN&&MB_UART_STATE!=MB_UART_READY&&
 		MB_UART_STATE!=MB_UART_BUFF_IS_FULL)
 	{
@@ -35,12 +34,10 @@ void mb_tim_periodElapsedCallback(TIM_HandleTypeDef *htim)
 			MB_UART_STATE=MB_UART_READY;
 		}
 		else MB_UART_STATE=MB_UART_LISTEN;
-		//mb_uart_buffer_reset();
-		//mb_uart_reset_char_listen(&mb_hal_uart);
 	}
 	else
 	{
-		//do somting in preload of 0xffff-0x8000 in 10k freq of timer
+		//do somting
 	}
 }
 //---------------------- mb_get_num_pakets ----------------------------
@@ -97,8 +94,6 @@ void mb_uart_set(UART_HandleTypeDef *huart)
   huart->Init.Mode = UART_MODE_TX_RX;
   huart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart->Init.OverSampling = UART_OVERSAMPLING_16;
- // huart->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
- // huart->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 }
 //---------------------- mb_tim_set -------------------------------------
 void mb_tim_set(TIM_HandleTypeDef *htim)
@@ -107,7 +102,7 @@ void mb_tim_set(TIM_HandleTypeDef *htim)
   //htim->Instance = TIM2;
   htim->Init.Prescaler =((HAL_RCC_GetSysClockFreq() / 1000000.0)*100)-1;	// 10Khz freq
   htim->Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim->Init.Period = 0xffff;
+  htim->Init.Period = 0x4000;							//TimeOut
   htim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 
