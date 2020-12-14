@@ -1,3 +1,9 @@
+/*
+ ModBus For Stm32
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include "mb.h"
 #include "string.h"
 //HAL_Status
