@@ -1,11 +1,11 @@
-/*----------------------- mod bus ------------------------------|
-*	mod bus lib for stm32 										|
-* using HAL lib													|
-*																|
-*	by: 		Liyanboy74									|
-*_______________________________________________________________|
-Mor Info: https://simplymodbus.ca 								*/
-/****************************************************************/
+/*
+ ModBus For Stm32
+ By Liyanboy74
+ https://github.com/liyanboy74
+ 
+ More Info: https://simplymodbus.ca 
+*/
+
 
 #include "main.h"
 
