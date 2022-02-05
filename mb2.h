@@ -39,6 +39,4 @@ uint8_t mb_rtu_response_write_multiple_coils(uint8_t *Buffer,uint8_t SlaveAd,uin
 uint8_t mb_rtu_request_write_multiple_registers(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data);
 uint8_t mb_rtu_response_write_multiple_registers(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartAd,uint16_t Quantity);
 
-
 #endif
-
