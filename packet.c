@@ -1,6 +1,5 @@
-#include <stdint.h>
-
-#include "mb2.h"
+#include "mb.h"
+#include "packet.h"
 #include "crc16.h"
 
 uint8_t mb_rtu_request_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartAd,uint16_t Quantity)
@@ -14,7 +13,7 @@ uint8_t mb_rtu_request_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartA
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -36,7 +35,7 @@ uint8_t mb_rtu_response_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint8_t len,ui
 		Buffer[i+3]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+3);
+	crc=crc16(Buffer,i+3);
 
 	Buffer[i+3]= crc&0xff;
 	Buffer[i+4]=(crc>>8)&0xff;
@@ -55,7 +54,7 @@ uint8_t mb_rtu_request_read_discrete_inputs(uint8_t *Buffer,uint8_t SlaveAd,uint
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -77,7 +76,7 @@ uint8_t mb_rtu_response_read_discrete_inputs(uint8_t *Buffer,uint8_t SlaveAd,uin
 		Buffer[i+3]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+3);
+	crc=crc16(Buffer,i+3);
 
 	Buffer[i+3]= crc&0xff;
 	Buffer[i+4]=(crc>>8)&0xff;
@@ -96,7 +95,7 @@ uint8_t mb_rtu_request_read_holding_registers(uint8_t *Buffer,uint8_t SlaveAd,ui
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -118,7 +117,7 @@ uint8_t mb_rtu_response_read_holding_registers(uint8_t *Buffer,uint8_t SlaveAd,u
 		Buffer[i+3]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+3);
+	crc=crc16(Buffer,i+3);
 
 	Buffer[i+3]= crc&0xff;
 	Buffer[i+4]=(crc>>8)&0xff;
@@ -137,7 +136,7 @@ uint8_t mb_rtu_request_read_input_registers(uint8_t *Buffer,uint8_t SlaveAd,uint
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -159,7 +158,7 @@ uint8_t mb_rtu_response_read_input_registers(uint8_t *Buffer,uint8_t SlaveAd,uin
 		Buffer[i+3]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+3);
+	crc=crc16(Buffer,i+3);
 
 	Buffer[i+3]= crc&0xff;
 	Buffer[i+4]=(crc>>8)&0xff;
@@ -178,7 +177,7 @@ uint8_t mb_rtu_request_write_single_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16_
 	Buffer[4]=(Data>>8)&0xff;
 	Buffer[5]= Data&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -197,7 +196,7 @@ uint8_t mb_rtu_response_write_single_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16
 	Buffer[4]=(Data>>8)&0xff;
 	Buffer[5]= Data&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -216,7 +215,7 @@ uint8_t mb_rtu_request_write_single_register(uint8_t *Buffer,uint8_t SlaveAd,uin
 	Buffer[4]=(Data>>8)&0xff;
 	Buffer[5]= Data&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -235,7 +234,7 @@ uint8_t mb_rtu_response_write_single_register(uint8_t *Buffer,uint8_t SlaveAd,ui
 	Buffer[4]=(Data>>8)&0xff;
 	Buffer[5]= Data&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -261,7 +260,7 @@ uint8_t mb_rtu_request_write_multiple_coils(uint8_t *Buffer,uint8_t SlaveAd,uint
 		Buffer[i+7]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+7);
+	crc=crc16(Buffer,i+7);
 
 	Buffer[i+7]= crc&0xff;
 	Buffer[i+8]=(crc>>8)&0xff;
@@ -280,7 +279,7 @@ uint8_t mb_rtu_response_write_multiple_coils(uint8_t *Buffer,uint8_t SlaveAd,uin
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
@@ -306,7 +305,7 @@ uint8_t mb_rtu_request_write_multiple_registers(uint8_t *Buffer,uint8_t SlaveAd,
 		Buffer[i+7]=Data[i];
 	}
 
-	crc=CRC16(Buffer,i+7);
+	crc=crc16(Buffer,i+7);
 
 	Buffer[i+7]= crc&0xff;
 	Buffer[i+8]=(crc>>8)&0xff;
@@ -325,7 +324,7 @@ uint8_t mb_rtu_response_write_multiple_registers(uint8_t *Buffer,uint8_t SlaveAd
 	Buffer[4]=(Quantity>>8)&0xff;
 	Buffer[5]= Quantity&0xff;
 
-	crc=CRC16(Buffer,6);
+	crc=crc16(Buffer,6);
 
 	Buffer[6]= crc&0xff;
 	Buffer[7]=(crc>>8)&0xff;
