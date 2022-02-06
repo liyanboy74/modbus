@@ -15,10 +15,10 @@ int main()
     //l=mb_rtu_response_read_coil(Buffer,0x11,5,(uint8_t *)"ABCDE");
     //for(i=0;i<l;i++)printf("%02x ",Buffer[i]);
 
-    TABLE_Write(TBALE_DOC,0,0x1234);
-    TABLE_Write(TBALE_DOC,1,0x5678);
+    TABLE_Write(TBALE_Coils,0,0x1234);
+    TABLE_Write(TBALE_Coils,1,0x5678);
 
-    Temp=TABLE_Read(TBALE_DOC,1);
+    Temp=TABLE_Read(TBALE_Coils,1);
 
     printf("Data: %x\r\n",Temp);
 

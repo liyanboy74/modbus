@@ -3,36 +3,24 @@
 #include "table.h"
 
 /**
- * Discrete Output Coils
- * Coil/Register Numbers: 1-9999
- * Data Addresses: 0000-270E
- * Read-Write
+ * MODBUS Data model
+ * ┌──────────────────┬─────────────┬─────────┐
+ * │ Rrimary tables   │ Object type │ Type of │
+ * ╞══════════════════╪═════════════╪═════════╡
+ * │ Discretes Input  │ Single bit  │    R    │
+ * ├──────────────────┼─────────────┼─────────┤
+ * │ Coils            │ Single bit  │   R/W   │
+ * ├──────────────────┼─────────────┼─────────┤
+ * │ Input Registers  │ 16-bit word │    R    │
+ * ├──────────────────┼─────────────┼─────────┤
+ * │ Holding Registers│ 16-bit word │   R/W   │
+ * └──────────────────┴─────────────┴─────────┘
  */
-uint16_t TBALE_DOC[TBALE_DOC_Size_x16];
 
-/**
- * Discrete Input Contacts
- * Coil/Register Numbers: 10001-19999
- * Data Addresses: 0000-270E
- * Read-Only
- */
-uint16_t TBALE_DIC[TBALE_DIC_Size_x16];
-
-/**
- * Analog Input Registers
- * Coil/Register Numbers: 30001-39999
- * Data Addresses: 0000-270E
- * Read-Write
- */
-uint16_t TBALE_AIR[TBALE_AIR_Size_x16];
-
-/**
- * Analog Output Holding Registers
- * Coil/Register Numbers: 40001-49999
- * Data Addresses: 0000-270E
- * Read-Write
- */
-uint16_t TBALE_AOHR[TBALE_AOHR_Size_x16];
+uint16_t TBALE_Discretes_Input  [TBALE_Discretes_Input_Size];
+uint16_t TBALE_Coils            [TBALE_Coils_Size];
+uint16_t TBALE_Input_Registers  [TBALE_Input_Registers_Size];
+uint16_t TABLE_Holding_Registers[TABLE_Holding_Registers_Size];
 
 
 void TABLE_Write(uint16_t *Table,uint16_t Index,uint16_t Value)
@@ -44,4 +32,3 @@ uint16_t TABLE_Read(uint16_t *Table,uint16_t Index)
 {
     return Table[Index];
 }
-

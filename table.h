@@ -3,23 +3,15 @@
 
 #include <stdint.h>
 
-//Discrete Output Coils
-#define TBALE_DOC_Size_x16      1
-//Discrete Input Contacts
-#define TBALE_DIC_Size_x16      1
-//Analog Input Registers
-#define TBALE_AIR_Size_x16      1
-//Analog Output Holding Registers
-#define TBALE_AOHR_Size_x16     1
+#define TBALE_Discretes_Input_Size      1
+#define TBALE_Coils_Size                1
+#define TBALE_Input_Registers_Size      1
+#define TABLE_Holding_Registers_Size    1
 
-//Discrete Output Coils
-extern uint16_t TBALE_DOC[];
-//Discrete Input Contacts
-extern uint16_t TBALE_DIC[];
-//Analog Input Registers
-extern uint16_t TBALE_AIR[];
-//Analog Output Holding Registers
-extern uint16_t TBALE_AOHR[];
+extern uint16_t TBALE_Discretes_Input  [];
+extern uint16_t TBALE_Coils            [];
+extern uint16_t TBALE_Input_Registers  [];
+extern uint16_t TABLE_Holding_Registers[];
 
 void TABLE_Write(uint16_t *Table,uint16_t Index,uint16_t Value);
 uint16_t TABLE_Read(uint16_t *Table,uint16_t Index);
