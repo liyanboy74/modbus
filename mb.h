@@ -3,13 +3,13 @@
 
 #include <stdint.h>
 
-//Comment that for SLAVE
+// Comment that for SLAVE
 #define MB_MASTER
 
-//Comment that for release
+// Comment that for release
 #define MB_DEBUG
 
-//ModBus Fanctions
+// ModBus Fanctions
 typedef enum{
 	MB_Read_Coils					= 0x01,
 	MB_Read_Discrete_Inputs			= 0x02,
@@ -21,7 +21,7 @@ typedef enum{
 	MB_Write_Multiple_Registers		= 0x10,
 }mb_functions_e;
 
-//MODBUS Exception Codes
+// MODBUS Exception Codes
 typedef enum{
 	MB_OK = 0x00,
 	MB_ERROR_ILLEGAL_FUNCTION = 0x01,
@@ -34,5 +34,18 @@ typedef enum{
 	MB_ERROR_GATEWAY_PATH_UNAVAILABLE = 0x0A,
 	MB_ERROR_FAILED_TO_RESPOND = 0x0B,
 }mb_error_e;
+
+// MOSBUS Mode
+typedef enum{
+	MB_MODE_MASTER=0,
+	MB_MODE_SLAVE=1,
+}mb_mode_e;
+
+typedef struct{
+	mb_mode_e mode;
+	uint8_t Address;
+}mb_config_s;
+
+extern mb_config_s MB_Config;
 
 #endif
