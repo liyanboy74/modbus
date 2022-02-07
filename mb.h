@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+//Comment that for SLAVE
+#define MB_MASTER
+
+//Comment that for release
+#define MB_DEBUG
+
 //ModBus Fanctions
 typedef enum{
 	MB_Read_Coils					= 0x01,

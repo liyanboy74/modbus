@@ -2,8 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <conio.h>
 
-#include "mb-crc.h"
+#include "fifo.h"
+#include "mb-link.h"
 
 int main()
 {
@@ -23,6 +25,14 @@ int main()
     mb_add_crc(Packet,6);
     printf("crc = %d\n%04x",mb_check_crc(Packet,8),*(uint16_t*)&Packet[6]);
     */
+
+   FIFO_Init(64);
+
+   while(1)
+   {
+       FIFO_Add(getche());
+       mb_link_check_new_data();
+   }
 
     return 0;
 }
