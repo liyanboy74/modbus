@@ -1,5 +1,5 @@
-#include "mb.h"
-#include "table.h"
+#include "mb-check.h"
+#include "mb-table.h"
 
 mb_error_e mb_check_func(uint8_t func)
 {
@@ -36,12 +36,4 @@ mb_error_e mb_check_table_address(uint16_t StartAd,uint16_t Quantity)
     if(StartAd>=(TBALE_Coils_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     if((StartAd+Quantity)>=(TBALE_Coils_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     return MB_OK;
-}
-
-mb_process_s* mb_process(mb_process_s* Obj)
-{
-    Obj->err=mb_check_func(Obj->func);
-    if(Obj->err)return Obj;
-
-    return Obj;
 }

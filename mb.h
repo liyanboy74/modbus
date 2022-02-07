@@ -29,19 +29,4 @@ typedef enum{
 	MB_ERROR_FAILED_TO_RESPOND = 0x0B,
 }mb_error_e;
 
-typedef struct {
-	uint8_t *request;
-	uint8_t *responce;
-	uint8_t request_len;
-	uint8_t responce_len;
-	mb_error_e err;
-	mb_functions_e func;
-}mb_process_s;
-
-mb_error_e mb_check_func(uint8_t func);
-mb_error_e mb_check_quantity(uint16_t Quantity);
-mb_error_e mb_check_table_bit_address(uint16_t StartAd,uint16_t Quantity);
-mb_error_e mb_check_table_address(uint16_t StartAd,uint16_t Quantity);
-
-
 #endif

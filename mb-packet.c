@@ -1,5 +1,4 @@
-#include "mb.h"
-#include "packet.h"
+#include "mb-packet.h"
 
 uint8_t mb_rtu_request_read_coil(uint8_t *Buffer,uint16_t StartAd,uint16_t Quantity)
 {
@@ -118,13 +117,7 @@ uint8_t mb_rtu_request_write_single_coil(uint8_t *Buffer,uint16_t CAddress,uint1
 
 uint8_t mb_rtu_response_write_single_coil(uint8_t *Buffer,uint16_t CAddress,uint16_t Data)
 {
-	Buffer[0]= MB_Write_Single_Coil;
-	Buffer[1]=(CAddress>>8)&0xff;
-	Buffer[2]= CAddress&0xff;
-	Buffer[3]=(Data>>8)&0xff;
-	Buffer[4]= Data&0xff;
-
-	return 5;
+	return mb_rtu_request_write_single_coil(Buffer,CAddress,Data);
 }
 
 uint8_t mb_rtu_request_write_single_register(uint8_t *Buffer,uint16_t RAddress,uint16_t Data)
@@ -140,13 +133,7 @@ uint8_t mb_rtu_request_write_single_register(uint8_t *Buffer,uint16_t RAddress,u
 
 uint8_t mb_rtu_response_write_single_register(uint8_t *Buffer,uint16_t RAddress,uint16_t Data)
 {
-	Buffer[0]= MB_Write_Single_Register	;
-	Buffer[1]=(RAddress>>8)&0xff;
-	Buffer[2]= RAddress&0xff;
-	Buffer[3]=(Data>>8)&0xff;
-	Buffer[4]= Data&0xff;
-
-	return 5;
+	return mb_rtu_request_write_single_register(Buffer,RAddress,Data);
 }
 
 uint8_t mb_rtu_request_write_multiple_coils(uint8_t *Buffer,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data)
@@ -170,7 +157,7 @@ uint8_t mb_rtu_request_write_multiple_coils(uint8_t *Buffer,uint16_t StartAd,uin
 
 uint8_t mb_rtu_response_write_multiple_coils(uint8_t *Buffer,uint16_t StartAd,uint16_t Quantity)
 {
-	Buffer[0]= MB_Write_Single_Register	;
+	Buffer[0]= MB_Write_Multiple_Coils	;
 	Buffer[1]=(StartAd>>8)&0xff;
 	Buffer[2]= StartAd&0xff;
 	Buffer[3]=(Quantity>>8)&0xff;

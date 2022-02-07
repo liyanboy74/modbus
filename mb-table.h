@@ -1,5 +1,5 @@
-#ifndef _TABLE_H_
-#define _TABLE_H_
+#ifndef _MB_TABLE_H_
+#define _MB_TABLE_H_
 
 #include <stdint.h>
 

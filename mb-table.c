@@ -1,4 +1,4 @@
-#include "table.h"
+#include "mb-table.h"
 
 /**
  * MODBUS Data model

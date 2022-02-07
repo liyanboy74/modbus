@@ -1,5 +1,5 @@
-#ifndef _PACKET_C
-#define _PACKET_C
+#ifndef _MB_PACKET_C
+#define _MB_PACKET_C
 
 #include "mb.h"
 

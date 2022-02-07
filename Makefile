@@ -1,2 +1,2 @@
 default:
-	gcc -Wall mb-crc.c packet.c table.c mb.c test.c
+	gcc -Wall mb-crc.c mb-packet.c mb-table.c mb-check.c test.c
