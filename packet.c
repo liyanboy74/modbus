@@ -2,21 +2,6 @@
 #include "packet.h"
 #include "crc16.h"
 
-mb_packet_len mb_rtu_error(uint8_t *Buffer,mb_functions_e Func,mb_error_e Exeption_Code)
-{
-	uint16_t crc;
-
-	Buffer[0]= 0x80|Func;
-	Buffer[1]= Exeption_Code;
-
-	crc=mb_crc16(Buffer,2);
-
-	Buffer[2]= crc&0xff;
-	Buffer[3]=(crc>>8)&0xff;
-
-	return 4;
-}
-
 mb_packet_len mb_rtu_request_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartAd,uint16_t Quantity)
 {
 	uint16_t crc;
@@ -347,3 +332,17 @@ mb_packet_len mb_rtu_response_write_multiple_registers(uint8_t *Buffer,uint8_t S
 	return 8;
 }
 
+mb_packet_len mb_rtu_error(uint8_t *Buffer,mb_functions_e Func,mb_error_e Exeption_Code)
+{
+	uint16_t crc;
+
+	Buffer[0]= 0x80|Func;
+	Buffer[1]= Exeption_Code;
+
+	crc=mb_crc16(Buffer,2);
+
+	Buffer[2]= crc&0xff;
+	Buffer[3]=(crc>>8)&0xff;
+
+	return 4;
+}

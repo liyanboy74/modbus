@@ -1,4 +1,3 @@
-#include "master.h"
 #include "mb.h"
 #include "table.h"
 
@@ -31,4 +30,5 @@ mb_error_e mb_check_bit_address(uint16_t StartAd,uint16_t Quantity)
     if((StartAd+Quantity)>=(TBALE_Coils_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     return MB_OK;
 }
+
 

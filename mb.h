@@ -1,6 +1,8 @@
 #ifndef _MB_H_
 #define _MB_H_
 
+#include <stdint.h>
+
 //ModBus Fanctions
 typedef enum{
 	MB_Read_Coils					= 0x01,
@@ -27,5 +29,9 @@ typedef enum{
 	MB_ERROR_FAILED_TO_RESPOND = 0x0B,
 }mb_error_e;
 
+
+mb_error_e mb_func_supported(uint8_t func);
+mb_error_e mb_check_quantity(uint16_t Quantity);
+mb_error_e mb_check_coils_address(uint16_t StartAd,uint16_t Quantity);
 
 #endif

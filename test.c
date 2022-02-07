@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include "mb.h"
-#include "master.h"
 #include "table.h"
 
 int main()
