@@ -17,7 +17,7 @@ typedef enum{
 
 //MODBUS Exception Codes
 typedef enum{
-	MB_ERROR_OK = 0x00,
+	MB_OK = 0x00,
 	MB_ERROR_ILLEGAL_FUNCTION = 0x01,
 	MB_ERROR_ILLEGAL_DATA_ADDRESS = 0x02,
 	MB_ERROR_ILLEGAL_DATA_VALUE = 0x03,
@@ -29,18 +29,11 @@ typedef enum{
 	MB_ERROR_FAILED_TO_RESPOND = 0x0B,
 }mb_error_e;
 
-typedef enum{
-	MB_CRC_OK=0,
-	MB_CRC_ERROR=1,
-}mb_crc_e;
-
-typedef uint8_t mb_packet_len;
-
 typedef struct {
 	uint8_t *request;
 	uint8_t *responce;
-	mb_packet_len request_len;
-	mb_packet_len responce_len;
+	uint8_t request_len;
+	uint8_t responce_len;
 	mb_error_e err;
 	mb_functions_e func;
 }mb_process_s;
@@ -49,10 +42,6 @@ mb_error_e mb_check_func(uint8_t func);
 mb_error_e mb_check_quantity(uint16_t Quantity);
 mb_error_e mb_check_table_bit_address(uint16_t StartAd,uint16_t Quantity);
 mb_error_e mb_check_table_address(uint16_t StartAd,uint16_t Quantity);
-
-mb_packet_len mb_add_crc(uint8_t *Buffer,mb_packet_len Len);
-mb_crc_e      mb_check_crc(uint8_t *Buffer,mb_packet_len Len);
-
 
 
 #endif

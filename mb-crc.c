@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "mb-crc.h"
 
 uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength)
 {
@@ -45,4 +45,19 @@ uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength)
 		wCRCWord ^= wCRCTable[nTemp];
 	}
 	return wCRCWord;
+}
+
+uint8_t mb_add_crc(uint8_t *Buffer,uint8_t Len)
+{
+    *(uint16_t*)&Buffer[Len]= mb_crc16(Buffer,Len);
+    return Len+2;
+}
+
+mb_crc_e mb_check_crc(uint8_t *Buffer,uint8_t Len)
+{
+    uint16_t *Pcrc,Tcrc;
+    Tcrc=mb_crc16(Buffer,Len-2);
+    Pcrc=(uint16_t*)(&Buffer[Len-2]);
+    if(Tcrc==*Pcrc)return MB_CRC_OK;
+    return MB_CRC_ERROR;
 }

@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "mb.h"
-#include "table.h"
+#include "mb-crc.h"
 
 int main()
 {
@@ -22,7 +21,7 @@ int main()
    /*
     uint8_t Packet[8]={0x11,0x01,0x00,0x13,0x00,0x25};//,0x0e,0x84};
     mb_add_crc(Packet,6);
-    printf("crc = %d\n%02x",mb_check_crc(Packet,8),*(uint16_t*)&Packet[6]);
+    printf("crc = %d\n%04x",mb_check_crc(Packet,8),*(uint16_t*)&Packet[6]);
     */
 
     return 0;
