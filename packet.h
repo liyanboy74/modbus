@@ -1,9 +1,7 @@
 #ifndef _PACKET_C
 #define _PACKET_C
 
-#include <stdint.h>
-
-typedef uint8_t mb_packet_len;
+#include "mb.h"
 
 mb_packet_len mb_rtu_request_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint16_t StartAd,uint16_t Quantity);
 mb_packet_len mb_rtu_response_read_coil(uint8_t *Buffer,uint8_t SlaveAd,uint8_t len,uint8_t *Data);
