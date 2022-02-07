@@ -25,7 +25,7 @@ mb_error_e mb_check_quantity(uint16_t Quantity)
     return MB_ERROR_ILLEGAL_DATA_VALUE;
 }
 
-mb_error_e mb_check_coils_address(uint16_t StartAd,uint16_t Quantity)
+mb_error_e mb_check_bit_address(uint16_t StartAd,uint16_t Quantity)
 {
     if(StartAd>=(TBALE_Coils_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     if((StartAd+Quantity)>=(TBALE_Coils_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
