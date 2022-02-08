@@ -5,9 +5,6 @@
 #include "mb-crc.h"
 #include "mb-check.h"
 
-#include "fifo.h"
-
-
 uint8_t MB_LINK_Buffer[MB_LINK_Buffer_Size];
 uint8_t MB_LINK_BufferIndex=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
 
@@ -21,6 +18,7 @@ void mb_link_error_handler(mb_link_error_e err)
         case MB_LINK_ERROR_CRC:printf("CRC Error!");break;
         case MB_LINK_ERROR_FUNC:printf("Func not match\n");break;
         case MB_LINK_ERROR_Address:printf("Addres not match!\n");break;
+        default:break;
     }
     #endif
     return;
@@ -35,7 +33,7 @@ void mb_link_reset_buffer(void)
 
 void mb_link_check_new_data(uint8_t Byte)
 {
-    if(MB_Config.mode==MB_MODE_MASTER)
+    if(mb_mode_get()==MB_MODE_MASTER)
     {
         if(!MB_LINK_BufferIndex) // Device Address
         {
@@ -47,7 +45,7 @@ void mb_link_check_new_data(uint8_t Byte)
             MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
             MB_LINK_BufferIndex++;
         }
-        else if(MB_LINK_Func==MB_Read_Coils||MB_LINK_Func==MB_Read_Discrete_Inputs||MB_LINK_Func==MB_Read_Holding_Registers||MB_LINK_Func==MB_Read_Input_Registers)
+        else if(MB_LINK_Func==MB_FUNC_Read_Coils||MB_LINK_Func==MB_FUNC_Read_Discrete_Inputs||MB_LINK_Func==MB_FUNC_Read_Holding_Registers||MB_LINK_Func==MB_FUNC_Read_Input_Registers)
         {
             if(MB_LINK_BufferIndex==2) // Size of Data Bytes
             {
@@ -55,6 +53,7 @@ void mb_link_check_new_data(uint8_t Byte)
                 {
                     mb_link_error_handler(MB_LINK_ERROR_Data_Size);
                     mb_link_reset_buffer();
+                    return;
                 }
                 else
                 {
@@ -72,13 +71,15 @@ void mb_link_check_new_data(uint8_t Byte)
                     {
                         // OK
                         mb_link_error_handler(MB_LINK_OK);
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Master_Responce_Var));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
                     mb_link_reset_buffer();
+                    return;
                 }
             }
         }
-        else if(MB_LINK_Func==MB_Write_Single_Coil||MB_LINK_Func==MB_Write_Single_Register||MB_LINK_Func==MB_Write_Multiple_Coils||MB_LINK_Func==MB_Write_Multiple_Registers)
+        else if(MB_LINK_Func==MB_FUNC_Write_Single_Coil||MB_LINK_Func==MB_FUNC_Write_Single_Register||MB_LINK_Func==MB_FUNC_Write_Multiple_Coils||MB_LINK_Func==MB_FUNC_Write_Multiple_Registers)
         {
             MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
             MB_LINK_BufferIndex++;
@@ -89,22 +90,25 @@ void mb_link_check_new_data(uint8_t Byte)
                 {
                     // OK
                     mb_link_error_handler(MB_LINK_OK);
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Master_Responce_Fix));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
                 mb_link_reset_buffer();
+                return;
             }
         }
         else // MB Func Not Match!
         {
             mb_link_error_handler(MB_LINK_ERROR_FUNC);
             mb_link_reset_buffer();
+            return;
         }
     }
     else // SLAVE Mode
     {
         if(!MB_LINK_BufferIndex) // Device Address
         {
-            if(MB_Config.Address==Byte)
+            if(mb_slave_address_get()==Byte)
             {
                 MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
                 MB_LINK_BufferIndex++;
@@ -116,7 +120,7 @@ void mb_link_check_new_data(uint8_t Byte)
             MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
             MB_LINK_BufferIndex++;
         }
-        else if(MB_LINK_Func==MB_Write_Multiple_Coils||MB_LINK_Func==MB_Write_Multiple_Registers)
+        else if(MB_LINK_Func==MB_FUNC_Write_Multiple_Coils||MB_LINK_Func==MB_FUNC_Write_Multiple_Registers)
         {
             if(MB_LINK_BufferIndex<6)
             {
@@ -129,6 +133,7 @@ void mb_link_check_new_data(uint8_t Byte)
                 {
                     mb_link_error_handler(MB_LINK_ERROR_Data_Size);
                     mb_link_reset_buffer();
+                    return;
                 }
                 else
                 {
@@ -146,13 +151,15 @@ void mb_link_check_new_data(uint8_t Byte)
                     {
                         // OK
                         mb_link_error_handler(MB_LINK_OK);
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Slave_Responce_Var));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
                     mb_link_reset_buffer();
+                    return;
                 }
             }
         }
-        else if(MB_LINK_Func==MB_Read_Coils||MB_LINK_Func==MB_Read_Discrete_Inputs||MB_LINK_Func==MB_Read_Holding_Registers||MB_LINK_Func==MB_Read_Input_Registers||MB_LINK_Func==MB_Write_Single_Coil||MB_LINK_Func==MB_Write_Single_Register)
+        else if(MB_LINK_Func==MB_FUNC_Read_Coils||MB_LINK_Func==MB_FUNC_Read_Discrete_Inputs||MB_LINK_Func==MB_FUNC_Read_Holding_Registers||MB_LINK_Func==MB_FUNC_Read_Input_Registers||MB_LINK_Func==MB_FUNC_Write_Single_Coil||MB_LINK_Func==MB_FUNC_Write_Single_Register)
         {
             MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
             MB_LINK_BufferIndex++;
@@ -163,15 +170,18 @@ void mb_link_check_new_data(uint8_t Byte)
                 {
                     // OK
                     mb_link_error_handler(MB_LINK_OK);
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Slave_Responce_Fix));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
                 mb_link_reset_buffer();
+                return;
             }
         }
         else // MB Func Not Match!
         {
             mb_link_error_handler(MB_LINK_ERROR_FUNC);
             mb_link_reset_buffer();
+            return;
         }
     }
 }

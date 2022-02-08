@@ -1,6 +1,8 @@
 #ifndef _MB_LINK_H_
 #define _MB_LINK_H_
 
+#include <stdint.h>
+
 #define MB_LINK_Buffer_Size     64 //MAx 256
 #define MB_LINK_Max_Data_Bytes_Len  (MB_LINK_Buffer_Size-9)
 
