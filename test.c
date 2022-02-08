@@ -33,7 +33,7 @@ int main()
     uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
     uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
 
-    uint8_t i;
+    uint8_t i,Byte;
 
     FIFO_Init(64);
 
@@ -57,16 +57,22 @@ int main()
 
     MB_Config.mode=MB_MODE_MASTER;
 
-    for(i=0;i<sizeof(M1)+sizeof(M2);i++)
+    for(i=0;i<(sizeof(M1)+sizeof(M2));i++)
     {
-        mb_link_check_new_data();
+        if(FIFO_Read(&Byte)==FIFO_OK)
+        {
+            mb_link_check_new_data(Byte);
+        }
     }
 
     MB_Config.mode=MB_MODE_SLAVE;
 
     for(i=0;i<sizeof(S1)+sizeof(S2);i++)
     {
-        mb_link_check_new_data();
+        if(FIFO_Read(&Byte)==FIFO_OK)
+        {
+            mb_link_check_new_data(Byte);
+        }
     }
 
     return 0;
