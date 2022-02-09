@@ -42,10 +42,13 @@ typedef enum{
 
 typedef enum{
 	MB_PACKET_TYPE_UNKNOWN,
+	MB_PACKET_TYPE_ERROR,
 	MB_PACKET_TYPE_Master_Responce_Var,
 	MB_PACKET_TYPE_Master_Responce_Fix,
 	MB_PACKET_TYPE_Slave_Responce_Var,
 	MB_PACKET_TYPE_Slave_Responce_Fix,
+	MB_PACKET_TYPE_Master_Request_Fix,
+	MB_PACKET_TYPE_Master_Request_Var,
 }mb_packet_type_e;
 
 typedef struct{
@@ -58,9 +61,9 @@ typedef struct{
 	uint8_t func;
 	uint16_t u16_1;
 	uint16_t u16_2;
-	mb_packet_type_e type;
 	uint8_t len;
 	uint8_t *Data;
+	mb_packet_type_e type;
 }mb_packet_s;
 
 void             mb_mode_set(mb_mode_e Mode);

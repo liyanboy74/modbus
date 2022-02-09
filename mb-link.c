@@ -5,7 +5,9 @@
 #include "mb-crc.h"
 #include "mb-check.h"
 
+uint8_t MB_LINK_Tx_Buffer[MB_LINK_Tx_Buffer_Size];
 uint8_t MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Size];
+
 uint8_t MB_LINK_Rx_Buffer_Index=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
 mb_packet_type_e MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 
@@ -25,9 +27,38 @@ void mb_link_error_handler(mb_link_error_e err)
     return;
 }
 
-void mb_link_prepare_tx_data(uint8_t * Data,uint8_t Len)
+mb_error_e mb_link_send(uint8_t *Data,uint8_t Len)
 {
-    mb_crc_add(Data,Len);
+    #ifdef MB_DEBUG
+    int i;
+    printf("TX: ");
+    for(i=0;i<Len;i++)printf("%02d ",Data[i]);
+    printf("\n");
+    #endif
+    return MB_OK;
+}
+
+mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
+{
+    int i;
+
+    MB_LINK_Tx_Buffer[1]=Packet.func;
+
+    if(mb_mode_get()==MB_MODE_SLAVE)
+    {
+        MB_LINK_Tx_Buffer[0]=mb_slave_address_get();
+
+        if(Packet.func==MB_FUNC_Read_Coils)
+        {
+            for(i=0;i<Packet.len;i++)
+            {
+                MB_LINK_Tx_Buffer[i+2]=Packet.Data[i];
+            }
+            i=mb_crc_add(MB_LINK_Tx_Buffer,i+2);
+            return mb_link_send(MB_LINK_Tx_Buffer,i);
+        }
+    }
+    return MB_ERROR_SLAVE_DEVICE_FAILURE;
 }
 
 void mb_link_reset_rx_buffer(void)

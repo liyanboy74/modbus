@@ -28,7 +28,6 @@ uint8_t mb_slave_address_get(void)
 
 mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type)
 {
-    uint8_t i;
     mb_packet_s Packet;
 
     Packet.device_address=Packet_Buffer[0];

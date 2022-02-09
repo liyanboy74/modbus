@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 #define MB_LINK_Rx_Buffer_Size     64 //MAx 256
+#define MB_LINK_Tx_Buffer_Size     64 //MAx 256
+
 #define MB_LINK_Rx_MDBL  (MB_LINK_Rx_Buffer_Size-9)
 
 typedef enum{
@@ -17,5 +19,6 @@ typedef enum{
 
 void mb_link_check_new_data(uint8_t Byte);
 void mb_link_reset_rx_buffer(void);
+mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet);
 
 #endif
