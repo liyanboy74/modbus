@@ -68,11 +68,16 @@ typedef struct{
 
 void             mb_mode_set(mb_mode_e Mode);
 mb_mode_e        mb_mode_get(void);
+
 void             mb_slave_address_set(uint8_t Address);
 uint8_t          mb_slave_address_get(void);
 
+void             mb_check_new_data(uint8_t Byte);
+void             mb_rx_timeOut_Handler();
+
 void             mb_tx_packet_handler(mb_packet_s Packet);
 void             mb_rx_packet_handler(mb_packet_s Packet);
+
 void             mb_error_handler(mb_functions_e func,mb_error_e err);
 
 

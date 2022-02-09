@@ -6,7 +6,6 @@
 
 #include "mb.h"
 #include "fifo.h"
-#include "mb-link.h"
 
 void mb_master_process_packet(mb_packet_s Packet)
 {
@@ -29,7 +28,7 @@ void send_fifo_data_to_mb()
     uint8_t Byte;
     while(FIFO_Read(&Byte)==FIFO_OK)
     {
-        mb_link_check_new_data(Byte);
+        mb_check_new_data(Byte);
     }
 }
 

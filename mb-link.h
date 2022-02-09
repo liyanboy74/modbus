@@ -18,6 +18,7 @@ typedef enum{
 }mb_link_error_e;
 
 void             mb_link_check_new_data(uint8_t Byte);
+
 void             mb_link_reset_rx_buffer(void);
 void             mb_link_prepare_tx_data(mb_packet_s Packet);
 
