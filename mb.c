@@ -3,6 +3,8 @@
 #include "mb-check.h"
 #include "mb-table.h"
 #include "mb-process.h"
+#include "mb-link.h"
+#include "mb-packet.h"
 
 mb_config_s MB_Config={.mode=MB_MODE_MASTER,.address=MB_DEFAULT_SLAVE_ADDRESS};
 
@@ -55,12 +57,9 @@ mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_pack
     return Packet;
 }
 
-void mb_error_handler(mb_error_e err)
+void mb_error_handler(mb_functions_e func,mb_error_e err)
 {
-    #ifdef MB_DEBUG
-    printf("MB_ERROR: %d\n",err);
-    #endif
-    return;
+    mb_link_prepare_tx_data(mb_packet_error(func,err));
 }
 
 
@@ -69,17 +68,17 @@ void mb_rx_packet_handler(mb_packet_s Packet)
     mb_error_e err;
 
     err=mb_check_func(Packet.func);
-    if(err){mb_error_handler(err);return;}
+    if(err){mb_error_handler(Packet.func,err);return;}
 
     if(mb_mode_get()==MB_MODE_SLAVE)
     {
         if(Packet.func==MB_FUNC_Read_Coils||Packet.func==MB_FUNC_Read_Discrete_Inputs)
         {
             err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_table_bit_address(Packet.u16_1,Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             switch (Packet.func)
             {
@@ -88,15 +87,15 @@ void mb_rx_packet_handler(mb_packet_s Packet)
                 default:break;
             }
 
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Read_Holding_Registers||Packet.func==MB_FUNC_Read_Input_Registers)
         {
             err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_table_address(Packet.u16_1,Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             switch (Packet.func)
             {
@@ -105,54 +104,54 @@ void mb_rx_packet_handler(mb_packet_s Packet)
                 default:break;
             }
 
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Write_Single_Coil)
         {
             err=mb_check_on_off(Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_table_bit_address(Packet.u16_1,0);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_single_coil(Packet);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Write_Single_Register)
         {
             err=mb_check_table_address(Packet.u16_1,0);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_single_register(Packet);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Write_Multiple_Coils)
         {
             err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_quantity_bit_n_byte(Packet.u16_2,Packet.len);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_table_bit_address(Packet.u16_1,Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_multiple_coils(Packet);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Write_Multiple_Registers)
         {
             err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_quantity_reg_n_byte(Packet.u16_2,Packet.len);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_check_table_address(Packet.u16_1,Packet.u16_2);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_multiple_register(Packet);
-            if(err){mb_error_handler(err);return;}
+            if(err){mb_error_handler(Packet.func,err);return;}
         }
     }
     else // Master

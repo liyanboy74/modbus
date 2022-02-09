@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-#define TBALE_Discretes_Input_Size      200
-#define TBALE_Coils_Size                200
-#define TBALE_Input_Registers_Size      200
-#define TABLE_Holding_Registers_Size    200
+#define TBALE_Discretes_Input_Size      100
+#define TBALE_Coils_Size                100
+#define TBALE_Input_Registers_Size      100
+#define TABLE_Holding_Registers_Size    100
 
 #define TABLE_Sel_BitSize               16
 

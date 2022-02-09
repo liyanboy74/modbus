@@ -68,6 +68,13 @@ mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
             i=mb_crc_add(MB_LINK_Tx_Buffer,6);
             return mb_link_send(MB_LINK_Tx_Buffer,i);
         }
+        else if(Packet.type==MB_PACKET_TYPE_ERROR)
+        {
+            MB_LINK_Tx_Buffer[1]=Packet.func;
+            MB_LINK_Tx_Buffer[2]=Packet.len;
+            mb_crc_add(MB_LINK_Tx_Buffer,3);
+            return mb_link_send(MB_LINK_Tx_Buffer,5);
+        }
     }
     return MB_ERROR_SLAVE_DEVICE_FAILURE;
 }
