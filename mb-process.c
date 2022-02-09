@@ -94,15 +94,38 @@ mb_error_e mb_slave_process_write_single_coil(mb_packet_s Packet)
 
 mb_error_e mb_slave_process_write_single_register(mb_packet_s Packet)
 {
-    return MB_ERROR_FAILED_TO_RESPOND;
+    mb_table_write(TABLE_Holding_Registers,Packet.u16_1,Packet.u16_2);
+    return mb_link_prepare_tx_data(mb_packet_response_write_single_register(Packet.u16_1,Packet.u16_2));
 }
 
 mb_error_e mb_slave_process_write_multiple_coils(mb_packet_s Packet)
 {
-    return MB_ERROR_FAILED_TO_RESPOND;
+    uint16_t i,Start;
+    uint32_t End;
+
+    Start=Packet.u16_1;
+    End=Packet.u16_2+Start;
+
+    for(i=0;Start<End;Start++,i++)
+    {
+        mb_table_write_bit(TBALE_Coils,Start,((Packet.Data[i/8])>>(i%8))&0x01);
+    }
+    return mb_link_prepare_tx_data(mb_packet_response_write_multiple_coils(Packet.u16_1,Packet.u16_2));
 }
 
 mb_error_e mb_slave_process_write_multiple_register(mb_packet_s Packet)
 {
-    return MB_ERROR_FAILED_TO_RESPOND;
+    uint16_t i,Start,Temp;
+    uint32_t End;
+
+    Start=Packet.u16_1;
+    End=Packet.u16_2+Start;
+
+    for(i=0;Start<End;Start++,i+=2)
+    {
+        Temp=(Packet.Data[i]<<8)|(Packet.Data[i+1]);
+        mb_table_write(TABLE_Holding_Registers,Start,Temp);
+    }
+
+    return mb_link_prepare_tx_data(mb_packet_response_write_multiple_registers(Packet.u16_1,Packet.u16_2));
 }

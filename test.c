@@ -15,84 +15,57 @@ void mb_master_process_packet(mb_packet_s Packet)
     #endif
 }
 
+void add_data_to_fifo(uint8_t * Data,uint8_t Size)
+{
+    int i;
+    for(i=0;i<Size;i++)
+    {
+        FIFO_Add(Data[i]);
+    }
+}
+
+void send_fifo_data_to_mb()
+{
+    uint8_t Byte;
+    while(FIFO_Read(&Byte)==FIFO_OK)
+    {
+        mb_link_check_new_data(Byte);
+    }
+}
+
 int main()
 {
-    /*
-    mb_error_e error;
-    error=mb_check_coils_address(15,1);
-    printf("Error Code %02x\r\n",error);
-    */
-    /*
-    mb_table_write(TBALE_Coils,0,0xf0f2);
-    printf("%04x \r\n",mb_table_read(TBALE_Coils,0));
-    printf("%02x \r\n",mb_table_read_bit(TBALE_Coils,1));
-    */
-
-    /*
-    uint8_t Packet[8]={0x11,0x01,0x00,0x13,0x00,0x25};//,0x0e,0x84};
-    mb_add_crc(Packet,6);
-    printf("crc = %d\n%04x",mb_check_crc(Packet,8),*(uint16_t*)&Packet[6]);
-    */
-
-    uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
-    uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
 
     uint8_t S1[]={0x11,0x01,0x00,0x13,0x00,0x25,0x0E,0x84};
     uint8_t S2[]={0x11,0x03,0x00,0x6B,0x00,0x03,0x76,0x87};
     uint8_t S3[]={0x11,0x04,0x00,0x08,0x00,0x01,0xB2,0x98};
     uint8_t S4[]={0x11,0x05,0x00,0xAC,0xFF,0x00,0x4E,0x8B};
+    uint8_t S5[]={0x11,0x06,0x00,0x01,0x00,0x03,0x9A,0x9B};
+    uint8_t S6[]={0x11,0x0F,0x00,0x13,0x00,0x0A,0x02,0xCD,0x01,0xBF,0x0B};
+    uint8_t S7[]={0x11,0x10,0x00,0x01,0x00,0x02,0x04,0x00,0x0A,0x01,0x02,0xC6,0xF0};
 
-    uint8_t i,Byte;
+    uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
+    uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
+
 
     FIFO_Init(128);
 
-    for(i=0;i<sizeof(S1);i++)
-    {
-        FIFO_Add(S1[i]);
-    }
-    for(i=0;i<sizeof(S2);i++)
-    {
-        FIFO_Add(S2[i]);
-    }
-    for(i=0;i<sizeof(S3);i++)
-    {
-        FIFO_Add(S3[i]);
-    }
-    for(i=0;i<sizeof(S4);i++)
-    {
-        FIFO_Add(S4[i]);
-    }
-
-    
-    for(i=0;i<sizeof(M1);i++)
-    {
-        FIFO_Add(M1[i]);
-    }
-    for(i=0;i<sizeof(M2);i++)
-    {
-        FIFO_Add(M2[i]);
-    }
-
+    add_data_to_fifo(S1,sizeof(S1));
+    add_data_to_fifo(S2,sizeof(S2));
+    add_data_to_fifo(S3,sizeof(S3));
+    add_data_to_fifo(S4,sizeof(S4));
+    add_data_to_fifo(S5,sizeof(S5));
+    add_data_to_fifo(S6,sizeof(S6));
+    add_data_to_fifo(S7,sizeof(S7));
 
     mb_mode_set(MB_MODE_SLAVE);
+    send_fifo_data_to_mb();
 
-    for(i=0;i<sizeof(S1)+sizeof(S2)+sizeof(S3)+sizeof(S4);i++)
-    {
-        if(FIFO_Read(&Byte)==FIFO_OK)
-        {
-            mb_link_check_new_data(Byte);
-        }
-    }
+    add_data_to_fifo(M1,sizeof(M1));
+    add_data_to_fifo(M2,sizeof(M2));
 
     mb_mode_set(MB_MODE_MASTER);
-
-    for(i=0;i<(sizeof(M1)+sizeof(M2));i++)
-    {
-        if(FIFO_Read(&Byte)==FIFO_OK)
-        {
-            mb_link_check_new_data(Byte);
-        }
-    }
+    send_fifo_data_to_mb();
 
     return 0;
 }
