@@ -59,6 +59,15 @@ mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
             i=mb_crc_add(MB_LINK_Tx_Buffer,i+3);
             return mb_link_send(MB_LINK_Tx_Buffer,i);
         }
+        else if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Fix)
+        {
+            MB_LINK_Tx_Buffer[2]=(Packet.u16_1>>8)&0xff;
+            MB_LINK_Tx_Buffer[3]=(Packet.u16_1&0xff);
+            MB_LINK_Tx_Buffer[4]=(Packet.u16_2>>8)&0xff;
+            MB_LINK_Tx_Buffer[5]=(Packet.u16_2&0xff);
+            i=mb_crc_add(MB_LINK_Tx_Buffer,6);
+            return mb_link_send(MB_LINK_Tx_Buffer,i);
+        }
     }
     return MB_ERROR_SLAVE_DEVICE_FAILURE;
 }

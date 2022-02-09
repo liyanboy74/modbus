@@ -88,7 +88,8 @@ mb_error_e mb_slave_process_read_input_registers(mb_packet_s Packet)
 
 mb_error_e mb_slave_process_write_single_coil(mb_packet_s Packet)
 {
-    return MB_ERROR_FAILED_TO_RESPOND;
+    mb_table_write_bit(TBALE_Coils,Packet.u16_1,Packet.u16_2>>8);
+    return mb_link_prepare_tx_data(mb_packet_response_write_single_coil(Packet.u16_1,Packet.u16_2));
 }
 
 mb_error_e mb_slave_process_write_single_register(mb_packet_s Packet)

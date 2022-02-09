@@ -40,6 +40,7 @@ int main()
     uint8_t S1[]={0x11,0x01,0x00,0x13,0x00,0x25,0x0E,0x84};
     uint8_t S2[]={0x11,0x03,0x00,0x6B,0x00,0x03,0x76,0x87};
     uint8_t S3[]={0x11,0x04,0x00,0x08,0x00,0x01,0xB2,0x98};
+    uint8_t S4[]={0x11,0x05,0x00,0xAC,0xFF,0x00,0x4E,0x8B};
 
     uint8_t i,Byte;
 
@@ -57,6 +58,10 @@ int main()
     {
         FIFO_Add(S3[i]);
     }
+    for(i=0;i<sizeof(S4);i++)
+    {
+        FIFO_Add(S4[i]);
+    }
 
     
     for(i=0;i<sizeof(M1);i++)
@@ -71,7 +76,7 @@ int main()
 
     mb_mode_set(MB_MODE_SLAVE);
 
-    for(i=0;i<sizeof(S1)+sizeof(S2)+sizeof(S3);i++)
+    for(i=0;i<sizeof(S1)+sizeof(S2)+sizeof(S3)+sizeof(S4);i++)
     {
         if(FIFO_Read(&Byte)==FIFO_OK)
         {
