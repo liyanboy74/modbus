@@ -240,5 +240,60 @@ void mb_link_check_new_data(uint8_t Byte)
     }
 }
 
+mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type)
+{
+    mb_packet_s Packet;
 
+    Packet.device_address=Packet_Buffer[0];
+    Packet.func=Packet_Buffer[1];
+    Packet.type=Packet_Type;
+
+    if(Packet.type==MB_PACKET_TYPE_Master_Responce_Var)
+    {
+        Packet.len=Packet_Buffer[2];
+        Packet.Data=&Packet_Buffer[3];
+    }
+    else if(Packet.type==MB_PACKET_TYPE_Master_Responce_Fix||Packet.type==MB_PACKET_TYPE_Slave_Responce_Fix)
+    {
+        Packet.u16_1=(Packet_Buffer[2]<<8)|(Packet_Buffer[3]);
+        Packet.u16_2=(Packet_Buffer[4]<<8)|(Packet_Buffer[5]);
+    }
+    else if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
+    {
+        Packet.u16_1=(Packet_Buffer[2]<<8)|(Packet_Buffer[3]);
+        Packet.u16_2=(Packet_Buffer[4]<<8)|(Packet_Buffer[5]);
+        Packet.len=Packet_Buffer[6];
+        Packet.Data=&Packet_Buffer[7];
+    }
+
+    return Packet;
+}
+
+mb_packet_type_e mb_get_packet_type(mb_mode_e Mode,mb_functions_e Func)
+{
+    if(Mode==MB_MODE_MASTER)
+    {
+        if(Func==MB_FUNC_Read_Coils||Func==MB_FUNC_Read_Discrete_Inputs||Func==MB_FUNC_Read_Holding_Registers||Func==MB_FUNC_Read_Input_Registers)
+        {
+            return MB_PACKET_TYPE_Master_Responce_Var;
+        }
+        else if(Func==MB_FUNC_Write_Single_Coil||Func==MB_FUNC_Write_Single_Register||Func==MB_FUNC_Write_Multiple_Coils||Func==MB_FUNC_Write_Multiple_Registers)
+        {
+            return MB_PACKET_TYPE_Master_Responce_Fix;
+        }
+        else return MB_PACKET_TYPE_UNKNOWN;
+    }
+    else // MB_MODE_SLAVE
+    {
+        if(Func==MB_FUNC_Write_Multiple_Coils||Func==MB_FUNC_Write_Multiple_Registers)
+        {
+            return MB_PACKET_TYPE_Slave_Responce_Var;
+        }
+        else if(Func==MB_FUNC_Read_Coils||Func==MB_FUNC_Read_Discrete_Inputs||Func==MB_FUNC_Read_Holding_Registers||Func==MB_FUNC_Read_Input_Registers||Func==MB_FUNC_Write_Single_Coil||Func==MB_FUNC_Write_Single_Register)
+        {
+            return MB_PACKET_TYPE_Slave_Responce_Fix;
+        }
+        else return MB_PACKET_TYPE_UNKNOWN;
+    }
+}
 
