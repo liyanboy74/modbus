@@ -47,13 +47,13 @@ uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength)
 	return wCRCWord;
 }
 
-uint8_t mb_add_crc(uint8_t *Buffer,uint8_t Len)
+uint8_t mb_crc_add(uint8_t *Buffer,uint8_t Len)
 {
     *(uint16_t*)&Buffer[Len]= mb_crc16(Buffer,Len);
     return Len+2;
 }
 
-mb_crc_e mb_check_crc(uint8_t *Buffer,uint8_t Len)
+mb_crc_e mb_crc_check(uint8_t *Buffer,uint8_t Len)
 {
     uint16_t *Pcrc,Tcrc;
     Tcrc=mb_crc16(Buffer,Len-2);

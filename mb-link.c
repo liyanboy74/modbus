@@ -5,8 +5,9 @@
 #include "mb-crc.h"
 #include "mb-check.h"
 
-uint8_t MB_LINK_Buffer[MB_LINK_Buffer_Size];
-uint8_t MB_LINK_BufferIndex=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
+uint8_t MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Size];
+uint8_t MB_LINK_Rx_Buffer_Index=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
+mb_packet_type_e MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 
 void mb_link_error_handler(mb_link_error_e err)
 {
@@ -24,163 +25,171 @@ void mb_link_error_handler(mb_link_error_e err)
     return;
 }
 
-void mb_link_reset_buffer(void)
+void mb_link_prepare_tx_data(uint8_t * Data,uint8_t Len)
 {
-    MB_LINK_BufferIndex=0;
+    mb_crc_add(Data,Len);
+}
+
+void mb_link_reset_rx_buffer(void)
+{
+    MB_LINK_Rx_Buffer_Index=0;
     MB_LINK_Loop_C=0;
     MB_LINK_Func=0;
+    MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 }
 
 void mb_link_check_new_data(uint8_t Byte)
 {
     if(mb_mode_get()==MB_MODE_MASTER)
     {
-        if(!MB_LINK_BufferIndex) // Device Address
+        if(!MB_LINK_Rx_Buffer_Index) // Device Address
         {
-            MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-            MB_LINK_BufferIndex++;
-        }else if(MB_LINK_BufferIndex==1) // Func
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
+        }else if(MB_LINK_Rx_Buffer_Index==1) // Func
         {
             MB_LINK_Func=Byte;
-            MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-            MB_LINK_BufferIndex++;
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
+            MB_LINK_Packet_Type=mb_get_packet_type(MB_MODE_MASTER,MB_LINK_Func);
         }
-        else if(MB_LINK_Func==MB_FUNC_Read_Coils||MB_LINK_Func==MB_FUNC_Read_Discrete_Inputs||MB_LINK_Func==MB_FUNC_Read_Holding_Registers||MB_LINK_Func==MB_FUNC_Read_Input_Registers)
+        else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Master_Responce_Var)
         {
-            if(MB_LINK_BufferIndex==2) // Size of Data Bytes
+            if(MB_LINK_Rx_Buffer_Index==2) // Size of Data Bytes
             {
-                if(Byte>MB_LINK_Max_Data_Bytes_Len)
+                if(Byte>MB_LINK_Rx_MDBL)
                 {
                     mb_link_error_handler(MB_LINK_ERROR_Data_Size);
-                    mb_link_reset_buffer();
+                    mb_link_reset_rx_buffer();
                     return;
                 }
                 else
                 {
-                    MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                    MB_LINK_BufferIndex++;
-                    MB_LINK_Loop_C=Byte+MB_LINK_BufferIndex+2;
+                    MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                    MB_LINK_Rx_Buffer_Index++;
+                    MB_LINK_Loop_C=Byte+MB_LINK_Rx_Buffer_Index+2;
                 }
-            }else if((MB_LINK_Loop_C > MB_LINK_BufferIndex) && MB_LINK_Loop_C) // Data + CRC
+            }else if((MB_LINK_Loop_C > MB_LINK_Rx_Buffer_Index) && MB_LINK_Loop_C) // Data + CRC
             {
-                MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                MB_LINK_BufferIndex++;
-                if(MB_LINK_Loop_C == MB_LINK_BufferIndex) // Data Ready
+                MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                MB_LINK_Rx_Buffer_Index++;
+                if(MB_LINK_Loop_C == MB_LINK_Rx_Buffer_Index) // Data Ready
                 {
-                    if(mb_check_crc(MB_LINK_Buffer,MB_LINK_BufferIndex)==MB_CRC_OK)
+                    if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
                         mb_link_error_handler(MB_LINK_OK);
-                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Master_Responce_Var));
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
-                    mb_link_reset_buffer();
+                    mb_link_reset_rx_buffer();
                     return;
                 }
             }
         }
-        else if(MB_LINK_Func==MB_FUNC_Write_Single_Coil||MB_LINK_Func==MB_FUNC_Write_Single_Register||MB_LINK_Func==MB_FUNC_Write_Multiple_Coils||MB_LINK_Func==MB_FUNC_Write_Multiple_Registers)
+        else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Master_Responce_Fix)
         {
-            MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-            MB_LINK_BufferIndex++;
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
 
-            if(MB_LINK_BufferIndex>=8)
+            if(MB_LINK_Rx_Buffer_Index>=8)
             {
-                if(mb_check_crc(MB_LINK_Buffer,8)==MB_CRC_OK)
+                if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
                     mb_link_error_handler(MB_LINK_OK);
-                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Master_Responce_Fix));
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
-                mb_link_reset_buffer();
+                mb_link_reset_rx_buffer();
                 return;
             }
         }
         else // MB Func Not Match!
         {
             mb_link_error_handler(MB_LINK_ERROR_FUNC);
-            mb_link_reset_buffer();
+            mb_link_reset_rx_buffer();
             return;
         }
     }
     else // SLAVE Mode
     {
-        if(!MB_LINK_BufferIndex) // Device Address
+        if(!MB_LINK_Rx_Buffer_Index) // Device Address
         {
             if(mb_slave_address_get()==Byte)
             {
-                MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                MB_LINK_BufferIndex++;
+                MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                MB_LINK_Rx_Buffer_Index++;
             }
             else mb_link_error_handler(MB_LINK_ERROR_Address);
-        }else if(MB_LINK_BufferIndex==1) // Func
+        }else if(MB_LINK_Rx_Buffer_Index==1) // Func
         {
             MB_LINK_Func=Byte;
-            MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-            MB_LINK_BufferIndex++;
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
+            MB_LINK_Packet_Type=mb_get_packet_type(MB_MODE_SLAVE,MB_LINK_Func);
         }
-        else if(MB_LINK_Func==MB_FUNC_Write_Multiple_Coils||MB_LINK_Func==MB_FUNC_Write_Multiple_Registers)
+        else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Slave_Responce_Var)
         {
-            if(MB_LINK_BufferIndex<6)
+            if(MB_LINK_Rx_Buffer_Index<6)
             {
-                MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                MB_LINK_BufferIndex++;
+                MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                MB_LINK_Rx_Buffer_Index++;
             }
-            else if(MB_LINK_BufferIndex==6) // Size of Data Bytes
+            else if(MB_LINK_Rx_Buffer_Index==6) // Size of Data Bytes
             {
-                if(Byte>MB_LINK_Max_Data_Bytes_Len)
+                if(Byte>MB_LINK_Rx_MDBL)
                 {
                     mb_link_error_handler(MB_LINK_ERROR_Data_Size);
-                    mb_link_reset_buffer();
+                    mb_link_reset_rx_buffer();
                     return;
                 }
                 else
                 {
-                    MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                    MB_LINK_BufferIndex++;
-                    MB_LINK_Loop_C=Byte+MB_LINK_BufferIndex+2;
+                    MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                    MB_LINK_Rx_Buffer_Index++;
+                    MB_LINK_Loop_C=Byte+MB_LINK_Rx_Buffer_Index+2;
                 }
-            }else if((MB_LINK_Loop_C > MB_LINK_BufferIndex) && MB_LINK_Loop_C) // Data + CRC
+            }else if((MB_LINK_Loop_C > MB_LINK_Rx_Buffer_Index) && MB_LINK_Loop_C) // Data + CRC
             {
-                MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-                MB_LINK_BufferIndex++;
-                if(MB_LINK_Loop_C == MB_LINK_BufferIndex) // Data Ready
+                MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+                MB_LINK_Rx_Buffer_Index++;
+                if(MB_LINK_Loop_C == MB_LINK_Rx_Buffer_Index) // Data Ready
                 {
-                    if(mb_check_crc(MB_LINK_Buffer,MB_LINK_BufferIndex)==MB_CRC_OK)
+                    if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
                         mb_link_error_handler(MB_LINK_OK);
-                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Slave_Responce_Var));
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
-                    mb_link_reset_buffer();
+                    mb_link_reset_rx_buffer();
                     return;
                 }
             }
         }
-        else if(MB_LINK_Func==MB_FUNC_Read_Coils||MB_LINK_Func==MB_FUNC_Read_Discrete_Inputs||MB_LINK_Func==MB_FUNC_Read_Holding_Registers||MB_LINK_Func==MB_FUNC_Read_Input_Registers||MB_LINK_Func==MB_FUNC_Write_Single_Coil||MB_LINK_Func==MB_FUNC_Write_Single_Register)
+        else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Slave_Responce_Fix)
         {
-            MB_LINK_Buffer[MB_LINK_BufferIndex]=Byte;
-            MB_LINK_BufferIndex++;
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
 
-            if(MB_LINK_BufferIndex>=8)
+            if(MB_LINK_Rx_Buffer_Index>=8)
             {
-                if(mb_check_crc(MB_LINK_Buffer,8)==MB_CRC_OK)
+                if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
                     mb_link_error_handler(MB_LINK_OK);
-                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Buffer,MB_LINK_BufferIndex-2,MB_PACKET_Slave_Responce_Fix));
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
-                mb_link_reset_buffer();
+                mb_link_reset_rx_buffer();
                 return;
             }
         }
         else // MB Func Not Match!
         {
             mb_link_error_handler(MB_LINK_ERROR_FUNC);
-            mb_link_reset_buffer();
+            mb_link_reset_rx_buffer();
             return;
         }
     }

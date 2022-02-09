@@ -7,7 +7,7 @@ typedef enum{
 
 uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength);
 
-uint8_t  mb_add_crc(uint8_t *Buffer,uint8_t Len);
-mb_crc_e mb_check_crc(uint8_t *Buffer,uint8_t Len);
+uint8_t  mb_crc_add(uint8_t *Buffer,uint8_t Len);
+mb_crc_e mb_crc_check(uint8_t *Buffer,uint8_t Len);
 
 

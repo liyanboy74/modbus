@@ -106,7 +106,7 @@ uint8_t mb_rtu_response_read_input_registers(uint8_t *Buffer,uint8_t len,uint8_t
 
 uint8_t mb_rtu_request_write_single_coil(uint8_t *Buffer,uint16_t CAddress,uint16_t Data)
 {
-	Buffer[0]= MB_FUNC_Write_Single_Coil	;
+	Buffer[0]= MB_FUNC_Write_Single_Coil;
 	Buffer[1]=(CAddress>>8)&0xff;
 	Buffer[2]= CAddress&0xff;
 	Buffer[3]=(Data>>8)&0xff;
@@ -122,7 +122,7 @@ uint8_t mb_rtu_response_write_single_coil(uint8_t *Buffer,uint16_t CAddress,uint
 
 uint8_t mb_rtu_request_write_single_register(uint8_t *Buffer,uint16_t RAddress,uint16_t Data)
 {
-	Buffer[0]= MB_FUNC_Write_Single_Register	;
+	Buffer[0]= MB_FUNC_Write_Single_Register;
 	Buffer[1]=(RAddress>>8)&0xff;
 	Buffer[2]= RAddress&0xff;
 	Buffer[3]=(Data>>8)&0xff;

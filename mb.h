@@ -6,6 +6,8 @@
 // Comment that for release
 #define MB_DEBUG
 
+#define MB_DEFAULT_SLAVE_ADDRESS 0x11
+
 // ModBus Fanctions
 typedef enum{
 	MB_FUNC_Read_Coils					= 0x01,
@@ -39,10 +41,11 @@ typedef enum{
 }mb_mode_e;
 
 typedef enum{
-	MB_PACKET_Master_Responce_Var,
-	MB_PACKET_Master_Responce_Fix,
-	MB_PACKET_Slave_Responce_Var,
-	MB_PACKET_Slave_Responce_Fix,
+	MB_PACKET_TYPE_UNKNOWN,
+	MB_PACKET_TYPE_Master_Responce_Var,
+	MB_PACKET_TYPE_Master_Responce_Fix,
+	MB_PACKET_TYPE_Slave_Responce_Var,
+	MB_PACKET_TYPE_Slave_Responce_Fix,
 }mb_packet_type_e;
 
 typedef struct{
@@ -60,22 +63,15 @@ typedef struct{
 	uint8_t *Data;
 }mb_packet_s;
 
-void        mb_mode_set(mb_mode_e Mode);
-mb_mode_e   mb_mode_get(void);
+void             mb_mode_set(mb_mode_e Mode);
+mb_mode_e        mb_mode_get(void);
+void             mb_slave_address_set(uint8_t Address);
+uint8_t          mb_slave_address_get(void);
+mb_packet_type_e mb_get_packet_type(mb_mode_e Mode,mb_functions_e Func);
+mb_packet_s      mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type);
+void             mb_rx_packet_handler(mb_packet_s Packet);
+void             mb_error_handler(mb_error_e err);
 
-void        mb_slave_address_set(uint8_t Address);
-uint8_t     mb_slave_address_get(void);
-
-mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type);
-void        mb_rx_packet_handler(mb_packet_s Packet);
-
-void        mb_error_handler(mb_error_e err);
-
-
-mb_error_e mb_slave_process_read_coils(mb_packet_s Packet);
-mb_error_e mb_slave_process_read_discrere_inputs(mb_packet_s Packet);
-mb_error_e mb_slave_process_read_holding_registers(mb_packet_s Packet);
-mb_error_e mb_slave_process_read_input_registers(mb_packet_s Packet);
 
 
 #endif
