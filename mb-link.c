@@ -32,7 +32,7 @@ mb_error_e mb_link_send(uint8_t *Data,uint8_t Len)
     #ifdef MB_DEBUG
     int i;
     printf("TX: ");
-    for(i=0;i<Len;i++)printf("%02d ",Data[i]);
+    for(i=0;i<Len;i++)printf("%02x ",Data[i]);
     printf("\n");
     #endif
     return MB_OK;
@@ -48,13 +48,15 @@ mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
     {
         MB_LINK_Tx_Buffer[0]=mb_slave_address_get();
 
-        if(Packet.func==MB_FUNC_Read_Coils)
+        if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
         {
+            MB_LINK_Tx_Buffer[2]=Packet.len;
+
             for(i=0;i<Packet.len;i++)
             {
-                MB_LINK_Tx_Buffer[i+2]=Packet.Data[i];
+                MB_LINK_Tx_Buffer[i+3]=Packet.Data[i];
             }
-            i=mb_crc_add(MB_LINK_Tx_Buffer,i+2);
+            i=mb_crc_add(MB_LINK_Tx_Buffer,i+3);
             return mb_link_send(MB_LINK_Tx_Buffer,i);
         }
     }
@@ -109,7 +111,6 @@ void mb_link_check_new_data(uint8_t Byte)
                     if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
-                        mb_link_error_handler(MB_LINK_OK);
                         mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
@@ -128,7 +129,6 @@ void mb_link_check_new_data(uint8_t Byte)
                 if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
-                    mb_link_error_handler(MB_LINK_OK);
                     mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
@@ -190,7 +190,6 @@ void mb_link_check_new_data(uint8_t Byte)
                     if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
-                        mb_link_error_handler(MB_LINK_OK);
                         mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
@@ -209,7 +208,6 @@ void mb_link_check_new_data(uint8_t Byte)
                 if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
-                    mb_link_error_handler(MB_LINK_OK);
                     mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);

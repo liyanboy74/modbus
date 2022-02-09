@@ -8,6 +8,13 @@
 #include "fifo.h"
 #include "mb-link.h"
 
+void mb_master_process_packet(mb_packet_s Packet)
+{
+    #ifdef MB_DEBUG
+    printf("M:OK\n");
+    #endif
+}
+
 int main()
 {
     /*
@@ -30,21 +37,13 @@ int main()
     uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
     uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
 
-    uint8_t S1[]={0x11,0x0F,0x00,0x13,0x00,0x0A,0x02,0xCD,0x01,0xBF,0x0B};
-    uint8_t S2[]={0x11,0x04,0x00,0x08,0x00,0x01,0xB2,0x98};
+    uint8_t S1[]={0x11,0x01,0x00,0x13,0x00,0x25,0x0E,0x84};
+    uint8_t S2[]={0x11,0x03,0x00,0x6B,0x00,0x03,0x76,0x87};
+    uint8_t S3[]={0x11,0x04,0x00,0x08,0x00,0x01,0xB2,0x98};
 
     uint8_t i,Byte;
 
-    FIFO_Init(64);
-
-    for(i=0;i<sizeof(M1);i++)
-    {
-        FIFO_Add(M1[i]);
-    }
-    for(i=0;i<sizeof(M2);i++)
-    {
-        FIFO_Add(M2[i]);
-    }
+    FIFO_Init(128);
 
     for(i=0;i<sizeof(S1);i++)
     {
@@ -54,10 +53,25 @@ int main()
     {
         FIFO_Add(S2[i]);
     }
+    for(i=0;i<sizeof(S3);i++)
+    {
+        FIFO_Add(S3[i]);
+    }
 
-    mb_mode_set(MB_MODE_MASTER);
+    
+    for(i=0;i<sizeof(M1);i++)
+    {
+        FIFO_Add(M1[i]);
+    }
+    for(i=0;i<sizeof(M2);i++)
+    {
+        FIFO_Add(M2[i]);
+    }
 
-    for(i=0;i<(sizeof(M1)+sizeof(M2));i++)
+
+    mb_mode_set(MB_MODE_SLAVE);
+
+    for(i=0;i<sizeof(S1)+sizeof(S2)+sizeof(S3);i++)
     {
         if(FIFO_Read(&Byte)==FIFO_OK)
         {
@@ -65,9 +79,9 @@ int main()
         }
     }
 
-    mb_mode_set(MB_MODE_SLAVE);
+    mb_mode_set(MB_MODE_MASTER);
 
-    for(i=0;i<sizeof(S1)+sizeof(S2);i++)
+    for(i=0;i<(sizeof(M1)+sizeof(M2));i++)
     {
         if(FIFO_Read(&Byte)==FIFO_OK)
         {
