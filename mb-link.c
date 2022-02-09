@@ -11,6 +11,17 @@ uint8_t MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Size];
 uint8_t MB_LINK_Rx_Buffer_Index=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
 mb_packet_type_e MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 
+mb_error_e mb_link_send(uint8_t *Data,uint8_t Len)
+{
+    #ifdef MB_DEBUG
+    int i;
+    printf("TX: ");
+    for(i=0;i<Len;i++)printf("%02x ",Data[i]);
+    printf("\n");
+    #endif
+    return MB_OK;
+}
+
 void mb_link_error_handler(mb_link_error_e err)
 {
     #ifdef MB_DEBUG
@@ -27,18 +38,7 @@ void mb_link_error_handler(mb_link_error_e err)
     return;
 }
 
-mb_error_e mb_link_send(uint8_t *Data,uint8_t Len)
-{
-    #ifdef MB_DEBUG
-    int i;
-    printf("TX: ");
-    for(i=0;i<Len;i++)printf("%02x ",Data[i]);
-    printf("\n");
-    #endif
-    return MB_OK;
-}
-
-mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
+void mb_link_prepare_tx_data(mb_packet_s Packet)
 {
     int i;
 
@@ -57,7 +57,8 @@ mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
                 MB_LINK_Tx_Buffer[i+3]=Packet.Data[i];
             }
             i=mb_crc_add(MB_LINK_Tx_Buffer,i+3);
-            return mb_link_send(MB_LINK_Tx_Buffer,i);
+            mb_link_send(MB_LINK_Tx_Buffer,i);
+            return;
         }
         else if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Fix)
         {
@@ -66,17 +67,47 @@ mb_error_e mb_link_prepare_tx_data(mb_packet_s Packet)
             MB_LINK_Tx_Buffer[4]=(Packet.u16_2>>8)&0xff;
             MB_LINK_Tx_Buffer[5]=(Packet.u16_2&0xff);
             i=mb_crc_add(MB_LINK_Tx_Buffer,6);
-            return mb_link_send(MB_LINK_Tx_Buffer,i);
+            mb_link_send(MB_LINK_Tx_Buffer,i);
+            return;
         }
         else if(Packet.type==MB_PACKET_TYPE_ERROR)
         {
             MB_LINK_Tx_Buffer[1]=Packet.func;
             MB_LINK_Tx_Buffer[2]=Packet.len;
             mb_crc_add(MB_LINK_Tx_Buffer,3);
-            return mb_link_send(MB_LINK_Tx_Buffer,5);
+            mb_link_send(MB_LINK_Tx_Buffer,5);
+            return;
         }
     }
-    return MB_ERROR_SLAVE_DEVICE_FAILURE;
+    else // MASTER
+    {
+        MB_LINK_Tx_Buffer[0]=Packet.device_address;
+        if(Packet.type==MB_PACKET_TYPE_Master_Request_Fix)
+        {
+            MB_LINK_Tx_Buffer[2]=(Packet.u16_1>>8)&0xff;
+            MB_LINK_Tx_Buffer[3]=(Packet.u16_1&0xff);
+            MB_LINK_Tx_Buffer[4]=(Packet.u16_2>>8)&0xff;
+            MB_LINK_Tx_Buffer[5]=(Packet.u16_2&0xff);
+            i=mb_crc_add(MB_LINK_Tx_Buffer,6);
+            mb_link_send(MB_LINK_Tx_Buffer,i);
+            return;
+        }
+        else if(Packet.type==MB_PACKET_TYPE_Master_Request_Var)
+        {
+            MB_LINK_Tx_Buffer[2]=(Packet.u16_1>>8)&0xff;
+            MB_LINK_Tx_Buffer[3]=(Packet.u16_1&0xff);
+            MB_LINK_Tx_Buffer[4]=(Packet.u16_2>>8)&0xff;
+            MB_LINK_Tx_Buffer[5]=(Packet.u16_2&0xff);
+            MB_LINK_Tx_Buffer[6]=Packet.len;
+            for(i=0;i<Packet.len;i++)
+            {
+                MB_LINK_Tx_Buffer[i+7]=Packet.Data[i];
+            }
+            i=mb_crc_add(MB_LINK_Tx_Buffer,i+7);
+            mb_link_send(MB_LINK_Tx_Buffer,i);
+            return;
+        }
+    }
 }
 
 void mb_link_reset_rx_buffer(void)
