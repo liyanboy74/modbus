@@ -43,8 +43,6 @@ typedef enum{
 typedef enum{
 	MB_PACKET_TYPE_UNKNOWN,
 	MB_PACKET_TYPE_ERROR,
-	MB_PACKET_TYPE_Master_Responce_Var,
-	MB_PACKET_TYPE_Master_Responce_Fix,
 	MB_PACKET_TYPE_Slave_Responce_Var,
 	MB_PACKET_TYPE_Slave_Responce_Fix,
 	MB_PACKET_TYPE_Master_Request_Fix,
@@ -73,7 +71,7 @@ void             mb_slave_address_set(uint8_t Address);
 uint8_t          mb_slave_address_get(void);
 
 void             mb_check_new_data(uint8_t Byte);
-void             mb_rx_timeOut_Handler();
+void             mb_rx_timeOut_handler();
 
 void             mb_tx_packet_handler(mb_packet_s Packet);
 void             mb_rx_packet_handler(mb_packet_s Packet);

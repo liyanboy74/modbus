@@ -1,8 +1,4 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <conio.h>
 
 #include "mb.h"
 #include "fifo.h"
@@ -10,7 +6,7 @@
 void mb_master_process_packet(mb_packet_s Packet)
 {
     #ifdef MB_DEBUG
-    printf("M:OK\n");
+    printf("MP: OK F:%02x T:%02x \n",Packet.func,Packet.type);
     #endif
 }
 
