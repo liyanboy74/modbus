@@ -85,7 +85,7 @@ void             mb_set_master_process_handler(void (f)(mb_packet_s));
 void             mb_set_tx_handler(void (f)(uint8_t *,uint8_t));
 
 void             mb_rx_new_data(uint8_t Byte);
-void             mb_rx_timeOut_handler(void);
+void             mb_rx_timeout_handler(void);
 
 void             mb_tx_packet_handler(mb_packet_s Packet);
 void             mb_rx_packet_handler(mb_packet_s Packet);
