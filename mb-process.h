@@ -1,5 +1,7 @@
 #include "mb.h"
 
+#if(MB_MODE==MB_MODE_SLAVE)
+
 #define MB_PROCESS_Buffer_Size 64
 
 void mb_slave_process_read_coils(mb_packet_s Packet);
@@ -11,4 +13,5 @@ void mb_slave_process_write_single_register(mb_packet_s Packet);
 void mb_slave_process_write_multiple_coils(mb_packet_s Packet);
 void mb_slave_process_write_multiple_register(mb_packet_s Packet);
 
-__attribute__ ((weak)) void mb_master_process_packet(mb_packet_s Packet);
+#endif
+

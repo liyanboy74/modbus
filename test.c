@@ -3,13 +3,6 @@
 #include "mb.h"
 #include "fifo.h"
 
-void mb_master_process_packet(mb_packet_s Packet)
-{
-    #ifdef MB_DEBUG
-    printf("MP: OK F:%02x T:%02x \n",Packet.func,Packet.type);
-    #endif
-}
-
 void add_data_to_fifo(uint8_t * Data,uint8_t Size)
 {
     int i;
@@ -28,6 +21,23 @@ void send_fifo_data_to_mb()
     }
 }
 
+void mb_send(uint8_t *Data,uint8_t Len)
+{
+    #ifdef MB_DEBUG
+    int i;
+    printf("TX: ");
+    for(i=0;i<Len;i++)printf("%02x ",Data[i]);
+    printf("\n");
+    #endif
+}
+
+void mb_process(mb_packet_s Packet)
+{
+    #ifdef MB_DEBUG
+    printf("MASTER: OK F:%02x T:%02x \n",Packet.func,Packet.type);
+    #endif
+}
+
 int main()
 {
 
@@ -39,9 +49,10 @@ int main()
     uint8_t S6[]={0x11,0x0F,0x00,0x13,0x00,0x0A,0x02,0xCD,0x01,0xBF,0x0B};
     uint8_t S7[]={0x11,0x10,0x00,0x01,0x00,0x02,0x04,0x00,0x0A,0x01,0x02,0xC6,0xF0};
 
-    uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
-    uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
+    //uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
+    //uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
 
+    mb_set_tx_handler(&mb_send);
 
     FIFO_Init(128);
 
@@ -53,13 +64,6 @@ int main()
     add_data_to_fifo(S6,sizeof(S6));
     add_data_to_fifo(S7,sizeof(S7));
 
-    mb_mode_set(MB_MODE_SLAVE);
-    send_fifo_data_to_mb();
-
-    add_data_to_fifo(M1,sizeof(M1));
-    add_data_to_fifo(M2,sizeof(M2));
-
-    mb_mode_set(MB_MODE_MASTER);
     send_fifo_data_to_mb();
 
     return 0;

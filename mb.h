@@ -3,10 +3,18 @@
 
 #include <stdint.h>
 
+// Mode List
+#define MB_MODE_MASTER  0
+#define MB_MODE_SLAVE   1
+
+// Mode Select
+#define MB_MODE         MB_MODE_SLAVE
+
+// Default SLAVE mode Device Address
+#define MB_DEFAULT_SLAVE_ADDRESS 0x11
+
 // Comment that for release
 #define MB_DEBUG
-
-#define MB_DEFAULT_SLAVE_ADDRESS 0x11
 
 // ModBus Fanctions
 typedef enum{
@@ -34,12 +42,6 @@ typedef enum{
 	MB_ERROR_FAILED_TO_RESPOND = 0x0B,
 }mb_error_e;
 
-// MOSBUS Mode
-typedef enum{
-	MB_MODE_MASTER=0,
-	MB_MODE_SLAVE=1,
-}mb_mode_e;
-
 typedef enum{
 	MB_PACKET_TYPE_UNKNOWN,
 	MB_PACKET_TYPE_ERROR,
@@ -48,11 +50,6 @@ typedef enum{
 	MB_PACKET_TYPE_Master_Request_Fix,
 	MB_PACKET_TYPE_Master_Request_Var,
 }mb_packet_type_e;
-
-typedef struct{
-	mb_mode_e mode;
-	uint8_t address;
-}mb_config_s;
 
 typedef struct{
 	uint8_t device_address;
@@ -64,19 +61,31 @@ typedef struct{
 	mb_packet_type_e type;
 }mb_packet_s;
 
-void             mb_mode_set(mb_mode_e Mode);
-mb_mode_e        mb_mode_get(void);
 
+typedef struct{
+	uint8_t address;
+	void (*tx_handler)(uint8_t *,uint8_t);
+	#if(MB_MODE==MB_MODE_MASTER)
+	void (*master_process_handler)(mb_packet_s);
+	#endif
+}mb_config_s;
+
+extern mb_config_s MB_Config;
+
+#if(MB_MODE==MB_MODE_SLAVE)
 void             mb_slave_address_set(uint8_t Address);
 uint8_t          mb_slave_address_get(void);
+#elif(MB_MODE==MB_MODE_MASTER)
+void             mb_set_master_process_handler(void (f)(mb_packet_s));
+#endif
+void             mb_set_tx_handler(void (f)(uint8_t *,uint8_t));
 
 void             mb_check_new_data(uint8_t Byte);
-void             mb_rx_timeOut_handler();
+void             mb_rx_timeOut_handler(void);
 
 void             mb_tx_packet_handler(mb_packet_s Packet);
 void             mb_rx_packet_handler(mb_packet_s Packet);
 
 void             mb_error_handler(mb_functions_e func,mb_error_e err);
-
 
 #endif

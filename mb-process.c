@@ -1,7 +1,10 @@
+#include <stdio.h>
 #include "mb-process.h"
 #include "mb-table.h"
 #include "mb-link.h"
 #include "mb-packet.h"
+
+#if(MB_MODE==MB_MODE_SLAVE)
 
 uint8_t MB_PROCESS_Buffer[MB_PROCESS_Buffer_Size];
 uint8_t MB_PROCESS_Buffer_Index=0;
@@ -129,3 +132,5 @@ void mb_slave_process_write_multiple_register(mb_packet_s Packet)
 
     mb_tx_packet_handler(mb_packet_response_write_multiple_registers(Packet.u16_1,Packet.u16_2));
 }
+
+#endif

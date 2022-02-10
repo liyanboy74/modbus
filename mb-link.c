@@ -11,20 +11,10 @@ uint8_t MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Size];
 uint8_t MB_LINK_Rx_Buffer_Index=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
 mb_packet_type_e MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 
-mb_error_e mb_link_send(uint8_t *Data,uint8_t Len)
-{
-    #ifdef MB_DEBUG
-    int i;
-    printf("TX: ");
-    for(i=0;i<Len;i++)printf("%02x ",Data[i]);
-    printf("\n");
-    #endif
-    return MB_OK;
-}
-
 void mb_link_error_handler(mb_link_error_e err)
 {
     #ifdef MB_DEBUG
+    printf("MB_LINK: ");
     switch(err)
     {
         case MB_LINK_OK:printf("OK!\n");break;
@@ -38,14 +28,20 @@ void mb_link_error_handler(mb_link_error_e err)
     return;
 }
 
+void mb_link_send(uint8_t *Data,uint8_t Len)
+{
+    if(MB_Config.tx_handler!=NULL)
+    MB_Config.tx_handler(Data,Len);
+}
+
 void mb_link_prepare_tx_data(mb_packet_s Packet)
 {
     int i;
 
     MB_LINK_Tx_Buffer[1]=Packet.func;
 
-    if(mb_mode_get()==MB_MODE_SLAVE)
-    {
+    #if(MB_MODE==MB_MODE_SLAVE)
+
         MB_LINK_Tx_Buffer[0]=mb_slave_address_get();
 
         if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
@@ -78,9 +74,9 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
             mb_link_send(MB_LINK_Tx_Buffer,5);
             return;
         }
-    }
-    else // MASTER
-    {
+
+    #elif(MB_MODE==MB_MODE_MASTER)
+
         MB_LINK_Tx_Buffer[0]=Packet.device_address;
         if(Packet.type==MB_PACKET_TYPE_Master_Request_Fix)
         {
@@ -107,7 +103,8 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
             mb_link_send(MB_LINK_Tx_Buffer,i);
             return;
         }
-    }
+
+    #endif
 }
 
 void mb_link_reset_rx_buffer(void)
@@ -120,8 +117,8 @@ void mb_link_reset_rx_buffer(void)
 
 void mb_link_check_new_data(uint8_t Byte)
 {
-    if(mb_mode_get()==MB_MODE_MASTER)
-    {
+    #if(MB_MODE==MB_MODE_MASTER)
+
         if(!MB_LINK_Rx_Buffer_Index) // Device Address
         {
             MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
@@ -131,7 +128,7 @@ void mb_link_check_new_data(uint8_t Byte)
             MB_LINK_Func=Byte;
             MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
             MB_LINK_Rx_Buffer_Index++;
-            MB_LINK_Packet_Type=mb_get_packet_type(MB_MODE_MASTER,MB_LINK_Func);
+            MB_LINK_Packet_Type=mb_get_packet_type(MB_LINK_Func);
         }
         else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Slave_Responce_Var)
         {
@@ -189,9 +186,9 @@ void mb_link_check_new_data(uint8_t Byte)
             mb_link_reset_rx_buffer();
             return;
         }
-    }
-    else // SLAVE Mode
-    {
+
+    #elif(MB_MODE==MB_MODE_SLAVE)
+
         if(!MB_LINK_Rx_Buffer_Index) // Device Address
         {
             if(mb_slave_address_get()==Byte)
@@ -205,7 +202,7 @@ void mb_link_check_new_data(uint8_t Byte)
             MB_LINK_Func=Byte;
             MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
             MB_LINK_Rx_Buffer_Index++;
-            MB_LINK_Packet_Type=mb_get_packet_type(MB_MODE_SLAVE,MB_LINK_Func);
+            MB_LINK_Packet_Type=mb_get_packet_type(MB_LINK_Func);
         }
         else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_Master_Request_Var)
         {
@@ -268,7 +265,7 @@ void mb_link_check_new_data(uint8_t Byte)
             mb_link_reset_rx_buffer();
             return;
         }
-    }
+    #endif
 }
 
 mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type)
@@ -300,10 +297,10 @@ mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_pack
     return Packet;
 }
 
-mb_packet_type_e mb_get_packet_type(mb_mode_e Mode,mb_functions_e Func)
+mb_packet_type_e mb_get_packet_type(mb_functions_e Func)
 {
-    if(Mode==MB_MODE_MASTER)
-    {
+    #if(MB_MODE==MB_MODE_MASTER)
+
         if(Func==MB_FUNC_Read_Coils||Func==MB_FUNC_Read_Discrete_Inputs||Func==MB_FUNC_Read_Holding_Registers||Func==MB_FUNC_Read_Input_Registers)
         {
             return MB_PACKET_TYPE_Slave_Responce_Var;
@@ -312,10 +309,9 @@ mb_packet_type_e mb_get_packet_type(mb_mode_e Mode,mb_functions_e Func)
         {
             return MB_PACKET_TYPE_Slave_Responce_Fix;
         }
-        else return MB_PACKET_TYPE_UNKNOWN;
-    }
-    else // MB_MODE_SLAVE
-    {
+
+    #elif(MB_MODE==MB_MODE_SLAVE)
+
         if(Func==MB_FUNC_Write_Multiple_Coils||Func==MB_FUNC_Write_Multiple_Registers)
         {
             return MB_PACKET_TYPE_Master_Request_Var;
@@ -324,7 +320,8 @@ mb_packet_type_e mb_get_packet_type(mb_mode_e Mode,mb_functions_e Func)
         {
             return MB_PACKET_TYPE_Master_Request_Fix;
         }
-        else return MB_PACKET_TYPE_UNKNOWN;
-    }
+
+    #endif
+    return MB_PACKET_TYPE_UNKNOWN;
 }
 
