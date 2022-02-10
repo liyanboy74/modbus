@@ -14,4 +14,3 @@ void mb_slave_process_write_multiple_coils(mb_packet_s Packet);
 void mb_slave_process_write_multiple_register(mb_packet_s Packet);
 
 #endif
-

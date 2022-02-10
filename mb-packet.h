@@ -3,6 +3,8 @@
 
 #include "mb.h"
 
+#if(MB_MODE==MB_MODE_MASTER)
+
 mb_packet_s mb_packet_request_read_coil(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity);
 mb_packet_s mb_packet_request_read_discrete_inputs(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity);
 mb_packet_s mb_packet_request_read_holding_registers(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity);
@@ -12,6 +14,7 @@ mb_packet_s mb_packet_request_write_single_register(uint8_t DeviceAddress,uint16
 mb_packet_s mb_packet_request_write_multiple_coils(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data);
 mb_packet_s mb_packet_request_write_multiple_registers(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data);
 
+#elif(MB_MODE==MB_MODE_SLAVE)
 
 mb_packet_s mb_packet_response_read_coil(uint8_t len,uint8_t *Data);
 mb_packet_s mb_packet_response_read_discrete_inputs(uint8_t len,uint8_t *Data);
@@ -23,5 +26,7 @@ mb_packet_s mb_packet_response_write_multiple_coils(uint16_t StartAd,uint16_t Qu
 mb_packet_s mb_packet_response_write_multiple_registers(uint16_t StartAd,uint16_t Quantity);
 
 mb_packet_s mb_packet_error(mb_functions_e Func,mb_error_e Exeption_Code);
+
+#endif
 
 #endif

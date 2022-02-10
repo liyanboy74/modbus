@@ -1,5 +1,7 @@
 #include "mb-packet.h"
 
+#if(MB_MODE==MB_MODE_MASTER)
+
 mb_packet_s mb_packet_request_read_coil(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity)
 {
 	mb_packet_s Packet;
@@ -92,6 +94,8 @@ mb_packet_s mb_packet_request_write_multiple_registers(uint8_t DeviceAddress,uin
 	return Packet;
 }
 
+#elif(MB_MODE==MB_MODE_SLAVE)
+
 mb_packet_s mb_packet_response_read_coil(uint8_t len,uint8_t *Data)
 {
 	mb_packet_s Packet;
@@ -180,3 +184,5 @@ mb_packet_s mb_packet_error(mb_functions_e Func,mb_error_e Exeption_Code)
 	Packet.len= Exeption_Code;
 	return Packet;
 }
+
+#endif

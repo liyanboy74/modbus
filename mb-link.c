@@ -19,7 +19,7 @@ void mb_link_error_handler(mb_link_error_e err)
     {
         case MB_LINK_OK:printf("OK!\n");break;
         case MB_LINK_ERROR_Data_Size:printf("Data Size ERROR!\n");break;
-        case MB_LINK_ERROR_CRC:printf("CRC Error!");break;
+        case MB_LINK_ERROR_CRC:printf("CRC Error!\n");break;
         case MB_LINK_ERROR_FUNC:printf("Func not match\n");break;
         case MB_LINK_ERROR_Address:printf("Addres not match!\n");break;
         default:break;

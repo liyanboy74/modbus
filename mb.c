@@ -36,7 +36,9 @@ void mb_set_tx_handler(void (*f)(uint8_t *,uint8_t))
 
 void mb_error_handler(mb_functions_e func,mb_error_e err)
 {
-    mb_link_prepare_tx_data(mb_packet_error(func,err));
+    #if(MB_MODE==MB_MODE_SLAVE)
+    mb_tx_packet_handler(mb_packet_error(func,err));
+    #endif
 }
 
 void mb_rx_packet_handler(mb_packet_s Packet)

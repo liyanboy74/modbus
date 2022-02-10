@@ -3,6 +3,9 @@
 #include "mb.h"
 #include "fifo.h"
 
+#include "mb-crc.h"
+#include "mb-packet.h"
+
 void add_data_to_fifo(uint8_t * Data,uint8_t Size)
 {
     int i;
@@ -21,7 +24,16 @@ void send_fifo_data_to_mb()
     }
 }
 
-void mb_send(uint8_t *Data,uint8_t Len)
+#if(MB_MODE==MB_MODE_MASTER)
+void master_process(mb_packet_s Packet)
+{
+    #ifdef MB_DEBUG
+    printf("MASTER: OK F:%02x T:%02x \n",Packet.func,Packet.type);
+    #endif
+}
+#endif
+
+void send_data(uint8_t *Data,uint8_t Len)
 {
     #ifdef MB_DEBUG
     int i;
@@ -31,40 +43,41 @@ void mb_send(uint8_t *Data,uint8_t Len)
     #endif
 }
 
-void mb_process(mb_packet_s Packet)
-{
-    #ifdef MB_DEBUG
-    printf("MASTER: OK F:%02x T:%02x \n",Packet.func,Packet.type);
-    #endif
-}
-
 int main()
 {
 
-    uint8_t S1[]={0x11,0x01,0x00,0x13,0x00,0x25,0x0E,0x84};
-    uint8_t S2[]={0x11,0x03,0x00,0x6B,0x00,0x03,0x76,0x87};
-    uint8_t S3[]={0x11,0x04,0x00,0x08,0x00,0x01,0xB2,0x98};
-    uint8_t S4[]={0x11,0x05,0x00,0xAC,0xFF,0x00,0x4E,0x8B};
-    uint8_t S5[]={0x11,0x06,0x00,0x01,0x00,0x03,0x9A,0x9B};
-    uint8_t S6[]={0x11,0x0F,0x00,0x13,0x00,0x0A,0x02,0xCD,0x01,0xBF,0x0B};
-    uint8_t S7[]={0x11,0x10,0x00,0x01,0x00,0x02,0x04,0x00,0x0A,0x01,0x02,0xC6,0xF0};
+    FIFO_Init(64);
 
-    //uint8_t M1[]={0x11,0x04,0x02,0x00,0x0A,0xF8,0xF4};
-    //uint8_t M2[]={0x11,0x03,0x06,0xAE,0x41,0x56,0x52,0x43,0x40,0x49,0xAD};
+    //Set Handler for transmit data from MODBUS layer
+    mb_set_tx_handler(&send_data);
 
-    mb_set_tx_handler(&mb_send);
+    #if(MB_MODE==MB_MODE_MASTER)
 
-    FIFO_Init(128);
+    //Set handler for process recaived packet in master mode
+    mb_set_master_process_handler(master_process);
 
-    add_data_to_fifo(S1,sizeof(S1));
-    add_data_to_fifo(S2,sizeof(S2));
-    add_data_to_fifo(S3,sizeof(S3));
-    add_data_to_fifo(S4,sizeof(S4));
-    add_data_to_fifo(S5,sizeof(S5));
-    add_data_to_fifo(S6,sizeof(S6));
-    add_data_to_fifo(S7,sizeof(S7));
+    //Testing Send Packet as Master
+    mb_tx_packet_handler(mb_packet_request_read_holding_registers(0x01,0x0000,0x0002));
 
+    //Simulate Recaiving Data in Master Mode
+    uint8_t A[]={0x01,0x03,0x04,0x00,0x00,0xff,0xff, 0,0};
+    mb_crc_add(A,sizeof(A)-2);
+    add_data_to_fifo(A,sizeof(A));
     send_fifo_data_to_mb();
+
+    #elif(MODE==MB_MODE_SLAVEV)
+
+    //Simulate Recaiving Data in Slave Mode
+    uint8_t A[]={0x01,0x06,0x00,0x01,0xFF,0xFF ,0,0};
+    uint8_t B[]={0x01,0x03,0x00,0x00,0x00,0x02 ,0,0};
+
+    mb_crc_add(A,sizeof(A)-2);
+    mb_crc_add(B,sizeof(B)-2);
+
+    add_data_to_fifo(A,sizeof(A));
+    add_data_to_fifo(B,sizeof(B));
+
+    #endif
 
     return 0;
 }
