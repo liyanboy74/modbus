@@ -10,7 +10,7 @@ void send_data_to_mb(uint8_t * Data,uint8_t Size)
     int i;
     for(i=0;i<Size;i++)
     {
-        mb_check_new_data(Data[i]);
+        mb_rx_new_data(Data[i]);
     }
 }
 
