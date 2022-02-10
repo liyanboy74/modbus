@@ -54,20 +54,20 @@ int main()
 
     #if(MB_MODE==MB_MODE_MASTER)
 
-    //Set handler for process recaived packet in master mode
+    //Set handler for process received packet in master mode
     mb_set_master_process_handler(master_process);
 
     //Testing Send Packet as Master
     mb_tx_packet_handler(mb_packet_request_read_holding_registers(0x01,0x0000,0x0002));
 
-    //Simulate Recaiving Data in Master Mode
+    //Simulate Receiving Data in Master Mode
     uint8_t A[]={0x01,0x03,0x04,0x00,0x00,0xff,0xff, 0,0};
     mb_crc_add(A,sizeof(A)-2);
     send_data_to_mb(A,sizeof(A));
 
     #elif(MODE==MB_MODE_SLAVEV)
 
-    //Simulate Recaiving Data in Slave Mode
+    //Simulate Receiving Data in Slave Mode
     uint8_t A[]={0x01,0x06,0x00,0x01,0xFF,0xFF ,0,0};
     uint8_t B[]={0x01,0x03,0x00,0x00,0x00,0x02 ,0,0};
 
