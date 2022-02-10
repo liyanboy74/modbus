@@ -1,3 +1,10 @@
+#ifndef _MB_CHEAK_H_
+#define _MB_CHEAK_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mb.h"
 
 mb_error_e mb_check_func(uint8_t func);
@@ -7,3 +14,9 @@ mb_error_e mb_check_table_bit_address(uint16_t StartAd,uint16_t Quantity);
 mb_error_e mb_check_table_address(uint16_t StartAd,uint16_t Quantity);
 mb_error_e mb_check_quantity_bit_n_byte(uint16_t Quantity,uint8_t N);
 mb_error_e mb_check_quantity_reg_n_byte(uint16_t Quantity,uint8_t N);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

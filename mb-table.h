@@ -1,6 +1,10 @@
 #ifndef _MB_TABLE_H_
 #define _MB_TABLE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define TBALE_Discretes_Input_Size      16
@@ -20,5 +24,9 @@ uint16_t mb_table_read(uint16_t *Table,uint16_t Index);
 
 void mb_table_write_bit(uint16_t *TABLE,uint16_t Bit_Index,uint8_t Bit_Value);
 uint8_t mb_table_read_bit(uint16_t *TABLE,uint16_t Bit_Index);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

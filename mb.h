@@ -1,6 +1,10 @@
 #ifndef _MB_H_
 #define _MB_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 // Mode List
@@ -87,5 +91,9 @@ void             mb_tx_packet_handler(mb_packet_s Packet);
 void             mb_rx_packet_handler(mb_packet_s Packet);
 
 void             mb_error_handler(mb_functions_e func,mb_error_e err);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

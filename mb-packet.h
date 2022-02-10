@@ -1,6 +1,10 @@
 #ifndef _MB_PACKET_C
 #define _MB_PACKET_C
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mb.h"
 
 #if(MB_MODE==MB_MODE_MASTER)
@@ -27,6 +31,10 @@ mb_packet_s mb_packet_response_write_multiple_registers(uint16_t StartAd,uint16_
 
 mb_packet_s mb_packet_error(mb_functions_e Func,mb_error_e Exeption_Code);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

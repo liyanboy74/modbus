@@ -1,6 +1,10 @@
 #ifndef _MB_LINK_H_
 #define _MB_LINK_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define MB_LINK_Rx_Buffer_Size     64 //MAx 256
@@ -26,5 +30,9 @@ void             mb_link_prepare_tx_data(mb_packet_s Packet);
 mb_packet_s      mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type);
 mb_packet_type_e mb_get_packet_type(mb_functions_e Func);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
