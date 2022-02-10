@@ -18,7 +18,21 @@ void send_data_to_mb(uint8_t * Data,uint8_t Size)
 void master_process(mb_packet_s Packet)
 {
     #ifdef MB_DEBUG
-    printf("MASTER: OK F:%02x T:%02x \n",Packet.func,Packet.type);
+    int i;
+    printf("MP: %02x %02x ",Packet.device_address,Packet.func);
+    if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
+    {
+        printf("%02x ",Packet.len);
+        for(i=0;i<Packet.len;i++)
+        {
+            printf("%02x",Packet.Data[i]);
+        }
+        printf("\n");
+    }
+    else
+    {
+        printf("%04x %04x\n",Packet.u16_1,Packet.u16_2);
+    }
     #endif
 }
 #endif
