@@ -142,7 +142,7 @@ void mb_check_new_data(uint8_t Byte)
     mb_link_check_new_data(Byte);
 }
 
-void mb_rx_timeOut_Handler()
+void mb_rx_timeOut_handler()
 {
     mb_link_reset_rx_buffer();
 }
