@@ -1,26 +1,16 @@
 #include <stdio.h>
 
 #include "mb.h"
-#include "fifo.h"
 
 #include "mb-crc.h"
 #include "mb-packet.h"
 
-void add_data_to_fifo(uint8_t * Data,uint8_t Size)
+void send_data_to_mb(uint8_t * Data,uint8_t Size)
 {
     int i;
     for(i=0;i<Size;i++)
     {
-        FIFO_Add(Data[i]);
-    }
-}
-
-void send_fifo_data_to_mb()
-{
-    uint8_t Byte;
-    while(FIFO_Read(&Byte)==FIFO_OK)
-    {
-        mb_check_new_data(Byte);
+        mb_check_new_data(Data[i]);
     }
 }
 
@@ -45,9 +35,6 @@ void send_data(uint8_t *Data,uint8_t Len)
 
 int main()
 {
-
-    FIFO_Init(64);
-
     //Set Handler for transmit data from MODBUS layer
     mb_set_tx_handler(&send_data);
 
@@ -62,8 +49,7 @@ int main()
     //Simulate Recaiving Data in Master Mode
     uint8_t A[]={0x01,0x03,0x04,0x00,0x00,0xff,0xff, 0,0};
     mb_crc_add(A,sizeof(A)-2);
-    add_data_to_fifo(A,sizeof(A));
-    send_fifo_data_to_mb();
+    send_data_to_mb(A,sizeof(A));
 
     #elif(MODE==MB_MODE_SLAVEV)
 
@@ -74,8 +60,8 @@ int main()
     mb_crc_add(A,sizeof(A)-2);
     mb_crc_add(B,sizeof(B)-2);
 
-    add_data_to_fifo(A,sizeof(A));
-    add_data_to_fifo(B,sizeof(B));
+    send_data_to_mb(A,sizeof(A));
+    send_data_to_mb(B,sizeof(B));
 
     #endif
 

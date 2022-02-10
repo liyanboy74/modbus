@@ -1,3 +1,0 @@
-[submodule "fifo-c-lib"]
-	path = fifo
-	url = https://github.com/liyanboy74/fifo-c-lib.git

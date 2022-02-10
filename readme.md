@@ -12,6 +12,3 @@
 - `mb-process` : Process received packets
 - `mb-table` : Database
 
-**Other**
-- `fifo` : FIFO for reading data
-

@@ -8,7 +8,7 @@
 #define MB_MODE_SLAVE   1
 
 // Mode Select
-#define MB_MODE         MB_MODE_MASTER
+#define MB_MODE         MB_MODE_SLAVE
 
 // Default SLAVE mode Device Address
 #define MB_DEFAULT_SLAVE_ADDRESS 0x01
