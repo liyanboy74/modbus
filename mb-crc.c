@@ -1,3 +1,9 @@
+/*
+ MODBUS CRC
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include "mb-crc.h"
 
 uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength)

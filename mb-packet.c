@@ -1,3 +1,9 @@
+/*
+ MODBUS Packet Maker
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include "mb-packet.h"
 
 #if(MB_MODE==MB_MODE_MASTER)

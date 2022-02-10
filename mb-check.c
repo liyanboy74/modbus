@@ -1,3 +1,9 @@
+/*
+ MODBUS Check Data and Addres
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include "mb-check.h"
 #include "mb-table.h"
 

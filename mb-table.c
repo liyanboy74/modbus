@@ -1,3 +1,9 @@
+/*
+ Table for MODBUS
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include "mb-table.h"
 
 /**

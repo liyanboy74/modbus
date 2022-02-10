@@ -1,3 +1,9 @@
+/*
+ MODBUS Link Layer
+ By Liyanboy74
+ https://github.com/liyanboy74
+*/
+
 #include <stdio.h>
 
 #include "mb.h"
