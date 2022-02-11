@@ -18,7 +18,7 @@ extern "C" {
 #define MB_DEFAULT_SLAVE_ADDRESS 0x01
 
 // Comment that for release
-#define MB_DEBUG
+//#define MB_DEBUG
 
 // ModBus Fanctions
 typedef enum{
