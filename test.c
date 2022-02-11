@@ -71,7 +71,7 @@ int main()
     mb_crc_add(A,sizeof(A)-2);
     send_data_to_mb(A,sizeof(A));
 
-    #elif(MODE==MB_MODE_SLAVEV)
+    #elif(MB_MODE==MB_MODE_SLAVE)
 
     //Simulate Receiving Data in Slave Mode
     uint8_t A[]={0x01,0x06,0x00,0x01,0xFF,0xFF ,0,0};
