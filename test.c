@@ -61,7 +61,7 @@ int main()
     #if(MB_MODE==MB_MODE_MASTER)
 
     //Set handler for process received packet in master mode
-    mb_set_master_process_handler(master_process);
+    mb_set_master_process_handler(&master_process);
 
     //Testing Send Packet as Master
     mb_tx_packet_handler(mb_packet_request_read_holding_registers(0x01,0x0000,0x0002));
