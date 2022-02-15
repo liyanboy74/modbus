@@ -74,8 +74,7 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
         }
         else if(Packet.type==MB_PACKET_TYPE_ERROR)
         {
-            MB_LINK_Tx_Buffer[1]=Packet.func;
-            MB_LINK_Tx_Buffer[2]=Packet.len;
+            MB_LINK_Tx_Buffer[2]=Packet.err;
             mb_crc_add(MB_LINK_Tx_Buffer,3);
             mb_link_send(MB_LINK_Tx_Buffer,5);
             return;
@@ -161,7 +160,7 @@ void mb_link_check_new_data(uint8_t Byte)
                     if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
-                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
                     mb_link_reset_rx_buffer();
@@ -179,7 +178,24 @@ void mb_link_check_new_data(uint8_t Byte)
                 if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
-                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Packet_Type));
+                }
+                else mb_link_error_handler(MB_LINK_ERROR_CRC);
+                mb_link_reset_rx_buffer();
+                return;
+            }
+        }
+        else if(MB_LINK_Packet_Type==MB_PACKET_TYPE_ERROR)
+        {
+            MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
+            MB_LINK_Rx_Buffer_Index++;
+
+            if(MB_LINK_Rx_Buffer_Index>=5)
+            {
+                if(mb_crc_check(MB_LINK_Rx_Buffer,5)==MB_CRC_OK)
+                {
+                    // OK
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
                 mb_link_reset_rx_buffer();
@@ -240,7 +256,7 @@ void mb_link_check_new_data(uint8_t Byte)
                     if(mb_crc_check(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index)==MB_CRC_OK)
                     {
                         // OK
-                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
+                        mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Packet_Type));
                     }
                     else mb_link_error_handler(MB_LINK_ERROR_CRC);
                     mb_link_reset_rx_buffer();
@@ -258,7 +274,7 @@ void mb_link_check_new_data(uint8_t Byte)
                 if(mb_crc_check(MB_LINK_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     // OK
-                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Rx_Buffer_Index-2,MB_LINK_Packet_Type));
+                    mb_rx_packet_handler(mb_rx_packet_split(MB_LINK_Rx_Buffer,MB_LINK_Packet_Type));
                 }
                 else mb_link_error_handler(MB_LINK_ERROR_CRC);
                 mb_link_reset_rx_buffer();
@@ -274,7 +290,7 @@ void mb_link_check_new_data(uint8_t Byte)
     #endif
 }
 
-mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type)
+mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,mb_packet_type_e Packet_Type)
 {
     mb_packet_s Packet;
 
@@ -299,6 +315,10 @@ mb_packet_s mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_pack
         Packet.len=Packet_Buffer[6];
         Packet.Data=&Packet_Buffer[7];
     }
+    else if(Packet.type==MB_PACKET_TYPE_ERROR)
+    {
+        Packet.err=Packet_Buffer[2];
+    }
 
     return Packet;
 }
@@ -314,6 +334,10 @@ mb_packet_type_e mb_get_packet_type(mb_functions_e Func)
         else if(Func==MB_FUNC_Write_Single_Coil||Func==MB_FUNC_Write_Single_Register||Func==MB_FUNC_Write_Multiple_Coils||Func==MB_FUNC_Write_Multiple_Registers)
         {
             return MB_PACKET_TYPE_Slave_Responce_Fix;
+        }
+        else if(Func&0x80)
+        {
+            return MB_PACKET_TYPE_ERROR;
         }
 
     #elif(MB_MODE==MB_MODE_SLAVE)

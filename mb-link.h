@@ -27,7 +27,7 @@ void             mb_link_send(uint8_t *Data,uint8_t Len);
 void             mb_link_reset_rx_buffer(void);
 void             mb_link_prepare_tx_data(mb_packet_s Packet);
 
-mb_packet_s      mb_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Packet_Len,mb_packet_type_e Packet_Type);
+mb_packet_s      mb_rx_packet_split(uint8_t *Packet_Buffer,mb_packet_type_e Packet_Type);
 mb_packet_type_e mb_get_packet_type(mb_functions_e Func);
 
 

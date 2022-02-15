@@ -17,7 +17,7 @@ uint8_t MB_PROCESS_Buffer_Index=0;
 
 mb_packet_s MB_PROCESS_Responce;
 
-void mb_slave_process_read_coils(mb_packet_s Packet)
+mb_error_e mb_slave_process_read_coils(mb_packet_s Packet)
 {
     uint16_t i,Start,Size;
     uint32_t End;
@@ -35,9 +35,10 @@ void mb_slave_process_read_coils(mb_packet_s Packet)
     if(i%8)Size++;
 
     mb_tx_packet_handler(mb_packet_response_read_coil(Size,MB_PROCESS_Buffer));
+    return MB_OK;
 }
 
-void mb_slave_process_read_discrere_inputs(mb_packet_s Packet)
+mb_error_e mb_slave_process_read_discrere_inputs(mb_packet_s Packet)
 {
     uint16_t i,Start,Size;
     uint32_t End;
@@ -55,9 +56,10 @@ void mb_slave_process_read_discrere_inputs(mb_packet_s Packet)
     if(i%8)Size++;
 
     mb_tx_packet_handler(mb_packet_response_read_discrete_inputs(Size,MB_PROCESS_Buffer));
+    return MB_OK;
 }
 
-void mb_slave_process_read_holding_registers(mb_packet_s Packet)
+mb_error_e mb_slave_process_read_holding_registers(mb_packet_s Packet)
 {
     uint16_t i,Start,Temp;
     uint32_t End;
@@ -74,9 +76,10 @@ void mb_slave_process_read_holding_registers(mb_packet_s Packet)
     }
 
     mb_tx_packet_handler(mb_packet_response_read_holding_registers(i,MB_PROCESS_Buffer));
+    return MB_OK;
 }
 
-void mb_slave_process_read_input_registers(mb_packet_s Packet)
+mb_error_e mb_slave_process_read_input_registers(mb_packet_s Packet)
 {
     uint16_t i,Start,Temp;
     uint32_t End;
@@ -93,21 +96,24 @@ void mb_slave_process_read_input_registers(mb_packet_s Packet)
     }
 
     mb_tx_packet_handler(mb_packet_response_read_input_registers(i,MB_PROCESS_Buffer));
+    return MB_OK;
 }
 
-void mb_slave_process_write_single_coil(mb_packet_s Packet)
+mb_error_e mb_slave_process_write_single_coil(mb_packet_s Packet)
 {
     mb_table_write_bit(TBALE_Coils,Packet.u16_1,Packet.u16_2>>8);
     mb_tx_packet_handler(mb_packet_response_write_single_coil(Packet.u16_1,Packet.u16_2));
+    return MB_OK;
 }
 
-void mb_slave_process_write_single_register(mb_packet_s Packet)
+mb_error_e mb_slave_process_write_single_register(mb_packet_s Packet)
 {
     mb_table_write(TABLE_Holding_Registers,Packet.u16_1,Packet.u16_2);
     mb_tx_packet_handler(mb_packet_response_write_single_register(Packet.u16_1,Packet.u16_2));
+    return MB_OK;
 }
 
-void mb_slave_process_write_multiple_coils(mb_packet_s Packet)
+mb_error_e mb_slave_process_write_multiple_coils(mb_packet_s Packet)
 {
     uint16_t i,Start;
     uint32_t End;
@@ -120,9 +126,10 @@ void mb_slave_process_write_multiple_coils(mb_packet_s Packet)
         mb_table_write_bit(TBALE_Coils,Start,((Packet.Data[i/8])>>(i%8))&0x01);
     }
     mb_tx_packet_handler(mb_packet_response_write_multiple_coils(Packet.u16_1,Packet.u16_2));
+    return MB_OK;
 }
 
-void mb_slave_process_write_multiple_register(mb_packet_s Packet)
+mb_error_e mb_slave_process_write_multiple_register(mb_packet_s Packet)
 {
     uint16_t i,Start,Temp;
     uint32_t End;
@@ -137,6 +144,7 @@ void mb_slave_process_write_multiple_register(mb_packet_s Packet)
     }
 
     mb_tx_packet_handler(mb_packet_response_write_multiple_registers(Packet.u16_1,Packet.u16_2));
+    return MB_OK;
 }
 
 #endif

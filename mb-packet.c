@@ -187,7 +187,7 @@ mb_packet_s mb_packet_error(mb_functions_e Func,mb_error_e Exeption_Code)
 	mb_packet_s Packet;
 	Packet.type=MB_PACKET_TYPE_ERROR;
 	Packet.func= 0x80|Func;
-	Packet.len= Exeption_Code;
+	Packet.err= Exeption_Code;
 	return Packet;
 }
 

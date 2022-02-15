@@ -25,19 +25,23 @@ void master_process(mb_packet_s Packet)
 {
     #ifdef MB_DEBUG
     int i;
-    printf("MP: %02x %02x ",Packet.device_address,Packet.func);
+    printf("MP: %02x ",Packet.device_address);
     if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
     {
-        printf("%02x ",Packet.len);
+        printf("%02x %02x ",Packet.func,Packet.len);
         for(i=0;i<Packet.len;i++)
         {
             printf("%02x",Packet.Data[i]);
         }
         printf("\n");
     }
-    else
+    else if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Fix)
     {
-        printf("%04x %04x\n",Packet.u16_1,Packet.u16_2);
+        printf("%02x %04x %04x\n",Packet.func,Packet.u16_1,Packet.u16_2);
+    }
+    else if(Packet.type==MB_PACKET_TYPE_ERROR)
+    {
+        printf("ERROR in %02x CODE %02x\n",Packet.func&0x7f,Packet.err);
     }
     #endif
 }
@@ -70,6 +74,11 @@ int main()
     uint8_t A[]={0x01,0x03,0x04,0x00,0x00,0xff,0xff, 0,0};
     mb_crc_add(A,sizeof(A)-2);
     send_data_to_mb(A,sizeof(A));
+
+    //Simulate Receiving Data in Master Mode
+    uint8_t B[]={0x01,0x83,0x04, 0,0};
+    mb_crc_add(B,sizeof(B)-2);
+    send_data_to_mb(B,sizeof(B));
 
     #elif(MB_MODE==MB_MODE_SLAVE)
 

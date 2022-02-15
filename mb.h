@@ -61,6 +61,7 @@ typedef struct{
 	uint16_t u16_1;
 	uint16_t u16_2;
 	uint8_t len;
+	uint8_t err;
 	uint8_t *Data;
 	mb_packet_type_e type;
 }mb_packet_s;
