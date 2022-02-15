@@ -1,5 +1,5 @@
-# MODBUS Lib
-Modbus RTU C library
+# MODBUS
+Modbus RTU C library for embedded systems.
 
 ### Guide 
 Follow below steps:
