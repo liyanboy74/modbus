@@ -12,7 +12,9 @@ extern "C" {
 #define MB_MODE_SLAVE   1
 
 // Mode Select
-#define MB_MODE         MB_MODE_SLAVE
+#ifndef MB_MODE
+	#define MB_MODE         MB_MODE_SLAVE
+#endif
 
 // Default SLAVE mode Device Address
 #define MB_DEFAULT_SLAVE_ADDRESS 0x01
