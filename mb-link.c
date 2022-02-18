@@ -114,10 +114,13 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
 
 void mb_link_reset_rx_buffer(void)
 {
-    MB_LINK_Rx_Buffer_Index=0;
-    MB_LINK_Loop_C=0;
-    MB_LINK_Func=0;
-    MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
+    if(MB_LINK_Rx_Buffer_Index)
+    {
+        MB_LINK_Rx_Buffer_Index=0;
+        MB_LINK_Loop_C=0;
+        MB_LINK_Func=0;
+        MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
+    }
 }
 
 void mb_link_check_new_data(uint8_t Byte)
