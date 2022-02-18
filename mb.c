@@ -1,7 +1,7 @@
 /*
  MODBUS
  By Liyanboy74
- https://github.com/liyanboy74
+ https://github.com/liyanboy74/modbus
 */
 
 #include <stdio.h>

@@ -1,7 +1,7 @@
 /*
  MODBUS CRC
  By Liyanboy74
- https://github.com/liyanboy74
+ https://github.com/liyanboy74/modbus
 */
 
 #include "mb-crc.h"

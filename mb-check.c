@@ -1,7 +1,7 @@
 /*
  MODBUS Check Data and Addres
  By Liyanboy74
- https://github.com/liyanboy74
+ https://github.com/liyanboy74/modbus
 */
 
 #include "mb-check.h"

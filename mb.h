@@ -1,3 +1,10 @@
+/*
+ MODBUS
+ RTU
+ By Liyanboy74
+ https://github.com/liyanboy74/modbus
+*/
+
 #ifndef _MB_H_
 #define _MB_H_
 
