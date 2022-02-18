@@ -20,7 +20,7 @@ mb_error_e mb_slave_process_read_coils(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i++)
     {
@@ -41,7 +41,7 @@ mb_error_e mb_slave_process_read_discrere_inputs(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i++)
     {
@@ -62,7 +62,7 @@ mb_error_e mb_slave_process_read_holding_registers(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i+=2)
     {
@@ -82,7 +82,7 @@ mb_error_e mb_slave_process_read_input_registers(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i+=2)
     {
@@ -116,7 +116,7 @@ mb_error_e mb_slave_process_write_multiple_coils(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i++)
     {
@@ -132,7 +132,7 @@ mb_error_e mb_slave_process_write_multiple_register(mb_packet_s Packet)
     uint32_t End;
 
     Start=Packet.u16_1;
-    End=Packet.u16_2+Start;
+    End=(uint32_t)Packet.u16_2+Start;
 
     for(i=0;Start<End;Start++,i+=2)
     {

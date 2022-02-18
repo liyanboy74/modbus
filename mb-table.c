@@ -27,14 +27,14 @@ uint16_t TBALE_Input_Registers  [TBALE_Input_Registers_Size];
 uint16_t TABLE_Holding_Registers[TABLE_Holding_Registers_Size];
 
 
-void mb_table_write(uint16_t *TBALE,uint16_t Index,uint16_t Value)
+void mb_table_write(uint16_t *Table,uint16_t Index,uint16_t Value)
 {
-    TBALE[Index]=Value;
+    Table[Index]=Value;
 }
 
-uint16_t mb_table_read(uint16_t *TBALE,uint16_t Index)
+uint16_t mb_table_read(uint16_t *Table,uint16_t Index)
 {
-    return TBALE[Index];
+    return Table[Index];
 }
 
 void mb_table_write_bit(uint16_t *TABLE,uint16_t Bit_Index,uint8_t Bit_Value)
