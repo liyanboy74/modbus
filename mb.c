@@ -54,6 +54,9 @@ void mb_rx_packet_handler(mb_packet_s Packet)
 
         mb_error_e err;
 
+        err=mb_check_func(Packet.func);
+        if(err){mb_error_handler(Packet.func,err);return;}
+
         if(Packet.func==MB_FUNC_Read_Coils||Packet.func==MB_FUNC_Read_Discrete_Inputs)
         {
             err=mb_check_quantity(Packet.u16_2);
@@ -133,11 +136,7 @@ void mb_rx_packet_handler(mb_packet_s Packet)
             err=mb_slave_process_write_multiple_register(Packet);
             if(err){mb_error_handler(Packet.func,err);return;}
         }
-        else
-        {
-            mb_error_handler(Packet.func,MB_ERROR_ILLEGAL_FUNCTION);
-            return;
-        }
+
     #elif(MB_MODE==MB_MODE_MASTER)
 
         if(MB_Config.master_process_handler!=NULL)
