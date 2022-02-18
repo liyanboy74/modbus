@@ -90,9 +90,9 @@ extern mb_config_s MB_Config;
 void             mb_slave_address_set(uint8_t Address);
 uint8_t          mb_slave_address_get(void);
 #elif(MB_MODE==MB_MODE_MASTER)
-void             mb_set_master_process_handler(void (f)(mb_packet_s));
+void             mb_set_master_process_handler(void (*f)(mb_packet_s));
 #endif
-void             mb_set_tx_handler(void (f)(uint8_t *,uint8_t));
+void             mb_set_tx_handler(void (*f)(uint8_t *,uint8_t));
 
 void             mb_rx_new_data(uint8_t Byte);
 void             mb_rx_timeout_handler(void);
