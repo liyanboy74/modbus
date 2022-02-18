@@ -13,9 +13,6 @@
 #if(MB_MODE==MB_MODE_SLAVE)
 
 uint8_t MB_PROCESS_Buffer[MB_PROCESS_Buffer_Size];
-uint8_t MB_PROCESS_Buffer_Index=0;
-
-mb_packet_s MB_PROCESS_Responce;
 
 mb_error_e mb_slave_process_read_coils(mb_packet_s Packet)
 {
