@@ -1,3 +1,6 @@
-.vscode
-*.o
-*.exe
+*
+!*.md
+!*.txt
+!*.c
+!*.h
+!Makefile
