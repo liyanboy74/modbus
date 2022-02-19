@@ -45,17 +45,32 @@ mb_error_e mb_check_quantity_reg_n_byte(uint16_t Quantity,uint8_t N)
     return MB_OK;
 }
 
-mb_error_e mb_check_table_bit_address(uint16_t StartAd,uint16_t Quantity)
+mb_error_e mb_check_table_coils_address(uint16_t StartAd,uint16_t Quantity)
 {
     if(StartAd>=(TBALE_Coils_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     if((StartAd+Quantity)>(TBALE_Coils_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     return MB_OK;
 }
 
-mb_error_e mb_check_table_address(uint16_t StartAd,uint16_t Quantity)
+mb_error_e mb_check_table_discretes_input_address(uint16_t StartAd,uint16_t Quantity)
 {
-    if(StartAd>=(TBALE_Coils_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
-    if((StartAd+Quantity)>(TBALE_Coils_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    if(StartAd>=(TBALE_Discretes_Input_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    if((StartAd+Quantity)>(TBALE_Discretes_Input_Size*TABLE_Sel_BitSize))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    return MB_OK;
+}
+
+
+mb_error_e mb_check_table_input_registers_address(uint16_t StartAd,uint16_t Quantity)
+{
+    if(StartAd>=(TBALE_Input_Registers_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    if((StartAd+Quantity)>(TBALE_Input_Registers_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    return MB_OK;
+}
+
+mb_error_e mb_check_table_holding_registers_address(uint16_t StartAd,uint16_t Quantity)
+{
+    if(StartAd>=(TABLE_Holding_Registers_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
+    if((StartAd+Quantity)>(TABLE_Holding_Registers_Size))return MB_ERROR_ILLEGAL_DATA_ADDRESS;
     return MB_OK;
 }
 

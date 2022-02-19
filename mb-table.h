@@ -7,12 +7,12 @@ extern "C" {
 
 #include <stdint.h>
 
-#define TBALE_Discretes_Input_Size      16
-#define TBALE_Coils_Size                16
+#define TBALE_Discretes_Input_Size      1
+#define TBALE_Coils_Size                1
 #define TBALE_Input_Registers_Size      16
 #define TABLE_Holding_Registers_Size    16
 
-#define TABLE_Sel_BitSize               16
+#define TABLE_Sel_BitSize               16 // Don't Change
 
 extern uint16_t TBALE_Discretes_Input  [];
 extern uint16_t TBALE_Coils            [];

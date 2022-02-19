@@ -1,7 +1,7 @@
 /*
  Test for MODBUS
  By Liyanboy74
- https://github.com/liyanboy74
+ https://github.com/liyanboy74/modbus
 */
 
 #include <stdio.h>
@@ -83,14 +83,17 @@ int main()
     #elif(MB_MODE==MB_MODE_SLAVE)
 
     //Simulate Receiving Data in Slave Mode
-    uint8_t A[]={0x01,0x06,0x00,0x01,0xFF,0xFF ,0,0};
-    uint8_t B[]={0x01,0x03,0x00,0x00,0x00,0x02 ,0,0};
+    uint8_t A[]={0x01,MB_FUNC_Write_Single_Register ,0x00,0x01,0xFF,0xFF ,0,0};
+    uint8_t B[]={0x01,MB_FUNC_Read_Holding_Registers,0x00,0x00,0x00,0x02 ,0,0};
+    uint8_t C[]={0x01,MB_FUNC_Read_Coils            ,0x00,0x00,0x00,0x10 ,0,0};
 
     mb_crc_add(A,sizeof(A)-2);
     mb_crc_add(B,sizeof(B)-2);
+    mb_crc_add(C,sizeof(C)-2);
 
     send_data_to_mb(A,sizeof(A));
     send_data_to_mb(B,sizeof(B));
+    send_data_to_mb(C,sizeof(C));
 
     #endif
 

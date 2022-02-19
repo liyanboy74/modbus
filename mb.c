@@ -57,36 +57,42 @@ void mb_rx_packet_handler(mb_packet_s Packet)
         err=mb_check_func(Packet.func);
         if(err){mb_error_handler(Packet.func,err);return;}
 
-        if(Packet.func==MB_FUNC_Read_Coils||Packet.func==MB_FUNC_Read_Discrete_Inputs)
+        if(Packet.func!=MB_FUNC_Write_Single_Coil && Packet.func!=MB_FUNC_Write_Single_Register)
         {
             err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(Packet.func,err);return;}
-
-            err=mb_check_table_bit_address(Packet.u16_1,Packet.u16_2);
-            if(err){mb_error_handler(Packet.func,err);return;}
-
-            switch (Packet.func)
-            {
-                case MB_FUNC_Read_Coils:err=mb_slave_process_read_coils(Packet);break;
-                case MB_FUNC_Read_Discrete_Inputs:err=mb_slave_process_read_discrere_inputs(Packet);break;
-                default:break;
-            }
             if(err){mb_error_handler(Packet.func,err);return;}
         }
-        else if(Packet.func==MB_FUNC_Read_Holding_Registers||Packet.func==MB_FUNC_Read_Input_Registers)
+
+        if(Packet.func==MB_FUNC_Read_Coils)
         {
-            err=mb_check_quantity(Packet.u16_2);
+            err=mb_check_table_coils_address(Packet.u16_1,Packet.u16_2);
             if(err){mb_error_handler(Packet.func,err);return;}
 
-            err=mb_check_table_address(Packet.u16_1,Packet.u16_2);
+            err=mb_slave_process_read_coils(Packet);
+            if(err){mb_error_handler(Packet.func,err);return;}
+        }
+        else if(Packet.func==MB_FUNC_Read_Discrete_Inputs)
+        {
+            err=mb_check_table_discretes_input_address(Packet.u16_1,Packet.u16_2);
             if(err){mb_error_handler(Packet.func,err);return;}
 
-            switch (Packet.func)
-            {
-                case MB_FUNC_Read_Holding_Registers:err=mb_slave_process_read_holding_registers(Packet);break;
-                case MB_FUNC_Read_Input_Registers:err=mb_slave_process_read_input_registers(Packet);break;
-                default:break;
-            }
+            err=mb_slave_process_read_discrere_inputs(Packet);
+            if(err){mb_error_handler(Packet.func,err);return;}
+        }
+        else if(Packet.func==MB_FUNC_Read_Holding_Registers)
+        {
+            err=mb_check_table_holding_registers_address(Packet.u16_1,Packet.u16_2);
+            if(err){mb_error_handler(Packet.func,err);return;}
+
+            err=mb_slave_process_read_holding_registers(Packet);
+            if(err){mb_error_handler(Packet.func,err);return;}
+        }
+        else if(Packet.func==MB_FUNC_Read_Input_Registers)
+        {
+            err=mb_check_table_input_registers_address(Packet.u16_1,Packet.u16_2);
+            if(err){mb_error_handler(Packet.func,err);return;}
+
+            err=mb_slave_process_read_input_registers(Packet);
             if(err){mb_error_handler(Packet.func,err);return;}
         }
         else if(Packet.func==MB_FUNC_Write_Single_Coil)
@@ -94,7 +100,7 @@ void mb_rx_packet_handler(mb_packet_s Packet)
             err=mb_check_on_off(Packet.u16_2);
             if(err){mb_error_handler(Packet.func,err);return;}
 
-            err=mb_check_table_bit_address(Packet.u16_1,0);
+            err=mb_check_table_coils_address(Packet.u16_1,0);
             if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_single_coil(Packet);
@@ -102,7 +108,7 @@ void mb_rx_packet_handler(mb_packet_s Packet)
         }
         else if(Packet.func==MB_FUNC_Write_Single_Register)
         {
-            err=mb_check_table_address(Packet.u16_1,0);
+            err=mb_check_table_holding_registers_address(Packet.u16_1,0);
             if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_single_register(Packet);
@@ -110,13 +116,10 @@ void mb_rx_packet_handler(mb_packet_s Packet)
         }
         else if(Packet.func==MB_FUNC_Write_Multiple_Coils)
         {
-            err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(Packet.func,err);return;}
-
             err=mb_check_quantity_bit_n_byte(Packet.u16_2,Packet.len);
             if(err){mb_error_handler(Packet.func,err);return;}
 
-            err=mb_check_table_bit_address(Packet.u16_1,Packet.u16_2);
+            err=mb_check_table_coils_address(Packet.u16_1,Packet.u16_2);
             if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_multiple_coils(Packet);
@@ -124,13 +127,10 @@ void mb_rx_packet_handler(mb_packet_s Packet)
         }
         else if(Packet.func==MB_FUNC_Write_Multiple_Registers)
         {
-            err=mb_check_quantity(Packet.u16_2);
-            if(err){mb_error_handler(Packet.func,err);return;}
-
             err=mb_check_quantity_reg_n_byte(Packet.u16_2,Packet.len);
             if(err){mb_error_handler(Packet.func,err);return;}
 
-            err=mb_check_table_address(Packet.u16_1,Packet.u16_2);
+            err=mb_check_table_holding_registers_address(Packet.u16_1,Packet.u16_2);
             if(err){mb_error_handler(Packet.func,err);return;}
 
             err=mb_slave_process_write_multiple_register(Packet);

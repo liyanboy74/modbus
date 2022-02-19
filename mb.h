@@ -1,6 +1,5 @@
 /*
  MODBUS
- RTU
  By Liyanboy74
  https://github.com/liyanboy74/modbus
 */
