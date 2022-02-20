@@ -1,7 +1,9 @@
 # MODBUS
 Modbus RTU C library for embedded systems.
 
-![data-flow - small](https://user-images.githubusercontent.com/64005694/154813013-10ace85b-084d-4c21-b0ba-a9b96da182f0.jpg)
+![MBLib-data-flow](https://user-images.githubusercontent.com/64005694/154830661-b1cc3740-ec50-44c9-9330-b34d01b1224c.svg)
+
+
 ### Guide 
 
 Follow below steps:
