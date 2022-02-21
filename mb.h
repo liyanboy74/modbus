@@ -95,8 +95,8 @@ extern mb_config_s MB_Config;
 // If Defined Mode as Slave
 #if(MB_MODE==MB_MODE_SLAVE)
 
-void             mb_slave_address_set(uint8_t Address);		// Set Slave Address
-uint8_t          mb_slave_address_get(void);				// Get Slave Address
+void             mb_slave_address_set(uint8_t Address);						// Set Slave Address
+uint8_t          mb_slave_address_get(void);								// Get Slave Address
 
 // If Defined Mode as Master
 #elif(MB_MODE==MB_MODE_MASTER)

@@ -6,6 +6,8 @@
 
 #include "mb-table.h"
 
+#if(MB_MODE==MB_MODE_SLAVE)
+
 /**
  * MODBUS Data model
  * ┌──────────────────┬─────────────┬─────────┐
@@ -57,3 +59,5 @@ uint8_t mb_table_read_bit(uint16_t *TABLE,uint16_t Bit_Index)
     ret&=1;
     return (uint8_t)ret;
 }
+
+#endif

@@ -7,18 +7,36 @@
 #include "mb-check.h"
 #include "mb-table.h"
 
+#if(MB_MODE==MB_MODE_SLAVE)
+
 mb_error_e mb_check_func(uint8_t func)
 {
     switch (func)
     {
+        #if MB_ENABLE_FUNC_Read_Coils
         case MB_FUNC_Read_Coils:break;
+        #endif
+        #if MB_ENABLE_FUNC_Read_Discrete_Inputs
         case MB_FUNC_Read_Discrete_Inputs:break;
+        #endif
+        #if MB_ENABLE_FUNC_Read_Holding_Registers
         case MB_FUNC_Read_Holding_Registers:break;
+        #endif
+        #if MB_ENABLE_FUNC_Read_Input_Registers
         case MB_FUNC_Read_Input_Registers:break;
+        #endif
+        #if MB_ENABLE_FUNC_Write_Single_Coil
         case MB_FUNC_Write_Single_Coil:break;
+        #endif
+        #if MB_ENABLE_FUNC_Write_Single_Register
         case MB_FUNC_Write_Single_Register:break;
+        #endif
+        #if MB_ENABLE_FUNC_Write_Multiple_Coils
         case MB_FUNC_Write_Multiple_Coils:break;
+        #endif
+        #if MB_ENABLE_FUNC_Write_Multiple_Registers
         case MB_FUNC_Write_Multiple_Registers:break;
+        #endif
         default:return MB_ERROR_ILLEGAL_FUNCTION;
     }
     return MB_OK;
@@ -79,3 +97,5 @@ mb_error_e mb_check_on_off(uint16_t Value)
     if(Value != 0xff00 && Value!=0x000) return MB_ERROR_ILLEGAL_DATA_VALUE;
     return MB_OK;
 }
+
+#endif
