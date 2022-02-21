@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
+#include "mb.h"
 
 #if(MB_MODE==MB_MODE_SLAVE)
 
