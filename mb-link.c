@@ -17,8 +17,11 @@ uint8_t MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Size];
 uint8_t MB_LINK_Rx_Buffer_Index=0,MB_LINK_Loop_C=0,MB_LINK_Func=0;
 mb_packet_type_e MB_LINK_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
 
+mb_link_error_e MB_LINK_Status=MB_LINK_OK;
+
 void mb_link_error_handler(mb_link_error_e err)
 {
+    MB_LINK_Status=err;
     #ifdef MB_DEBUG
     printf("MB_LINK: ");
     switch(err)

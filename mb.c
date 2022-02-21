@@ -40,13 +40,14 @@ void mb_set_tx_handler(void (*f)(uint8_t *,uint8_t))
     MB_Config.tx_handler=f;
 }
 
+#if(MB_MODE==MB_MODE_SLAVE)
 void mb_error_handler(mb_functions_e func,mb_error_e err)
 {
-    #if(MB_MODE==MB_MODE_SLAVE)
+    
     mb_tx_packet_handler(mb_packet_error(func,err));
-    #endif
     return;
 }
+#endif
 
 void mb_rx_packet_handler(mb_packet_s Packet)
 {
