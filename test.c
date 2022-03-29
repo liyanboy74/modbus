@@ -140,7 +140,7 @@ int main()
         mb_rx_timeout_handler();
     }
 
-    printf("\nSTAUS %02d/%02d %s\n",AnsIndex,TestNum,(TestNum==AnsIndex)?"PASS":"FAIL");
+    printf("\nSTATUS %02d/%02d %s\n",AnsIndex,TestNum,(TestNum==AnsIndex)?"PASS":"FAIL");
 
     #elif(MB_MODE==MB_MODE_MASTER)
 
@@ -167,7 +167,7 @@ int main()
     for(i=0;i<sizeof(Packets)/sizeof(mb_packet_s);i++)
     mb_tx_packet_handler(Packets[i]);
 
-    printf("\nSTAUS %02d/%02d %s\n",AnsIndex,TestNum,(TestNum==AnsIndex)?"PASS":"FAIL");
+    printf("\nSTATUS %02d/%02d %s\n",AnsIndex,TestNum,(TestNum==AnsIndex)?"PASS":"FAIL");
 
     bar();
     printf("Process received packet from slave:\n\n");
@@ -181,7 +181,7 @@ int main()
         mb_rx_timeout_handler();
     }
 
-    printf("\nSTAUS %02d/%02d %s\n",MPIndex,TestNum,(TestNum==MPIndex)?"PASS":"FAIL");
+    printf("\nSTATUS %02d/%02d %s\n",MPIndex,TestNum,(TestNum==MPIndex)?"PASS":"FAIL");
 
     #endif
 
