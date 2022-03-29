@@ -38,7 +38,7 @@ const uint8_t SlaveAns[TestNum][9]={
     {0x01,0x03,0x02,0x00,0xff,0xf8,0x04},
 };
 
-const uint8_t MasterReq[TestNum+1][11]={
+const uint8_t MasterReq[TestNum][11]={
     {0x01,0x05,0x00,0x00,0xff,0x00,0x8c,0x3a},
     {0x01,0x01,0x00,0x00,0x00,0x10,0x3d,0xc6},
     {0x01,0x06,0x00,0x00,0xff,0xff,0x88,0x7a},
@@ -47,9 +47,8 @@ const uint8_t MasterReq[TestNum+1][11]={
     {0x01,0x04,0x00,0x00,0x00,0x01,0x31,0xca},
     {0x01,0x0f,0x00,0x00,0x00,0x10,0x02,0x00,0xff,0xa2,0x60},
     {0x01,0x01,0x00,0x00,0x00,0x10,0x3d,0xc6},
-    {0x01,0x10,0x00,0x01,0x00,0x01,0x02,0x00,0xff,0xe7,0xc1},
+    {0x00,0x10,0x00,0x01,0x00,0x01,0x02,0x00,0xff,0xea,0x51},   // Broadcast don't answer
     {0x01,0x03,0x00,0x01,0x00,0x01,0xd5,0xca},
-    {0x00,0x03,0x00,0x01,0x00,0x01,0xd5,0xca}, // Broadcast don't answer
 };
 
 void bar()
@@ -106,6 +105,7 @@ void send_data(uint8_t *Data,uint8_t Len)
     int i;
     printf("TX: ");
     for(i=0;i<Len;i++)printf("%02x ",Data[i]);
+    if(AnsIndex==8)AnsIndex++; // Break Broadcast packet
     if(strncmp((char*)Data,(char*)SlaveAns[AnsIndex++],Len)==0)
     {
         printf("\t\tOK");
@@ -132,7 +132,7 @@ int main()
     printf("Simulate receive packets from master:\n\n");
 
 
-    for(i=0;i<TestNum+1;i++)
+    for(i=0;i<TestNum;i++)
     {
         for(j=0;j<11;j++)
         {
@@ -141,7 +141,7 @@ int main()
         mb_rx_timeout_handler();
     }
 
-    printf("\nSTATUS %02d/%02d %s\n",AnsIndex,TestNum,(TestNum==AnsIndex)?"PASS":"FAIL");
+    printf("\nSTATUS %02d/%02d %s\n",AnsPIndex+1,TestNum,(TestNum==(AnsPIndex+1))?"PASS":"FAIL");
 
     #elif(MB_MODE==MB_MODE_MASTER)
 
@@ -159,7 +159,7 @@ int main()
         mb_packet_request_read_input_registers(1,0,1),
         mb_packet_request_write_multiple_coils(1,0,16,2,TData),
         mb_packet_request_read_coil(1,0,16),
-        mb_packet_request_write_multiple_registers(1,1,1,2,TData),
+        mb_packet_request_write_multiple_registers(0,1,1,2,TData),
         mb_packet_request_read_holding_registers(1,1,1)
     };
 
