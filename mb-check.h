@@ -9,17 +9,6 @@ extern "C" {
 
 #if(MB_MODE==MB_MODE_SLAVE)
 
-// Enable or Disable Support Modbus Function for Slave Mode
-#define MB_ENABLE_FUNC_Read_Coils               1
-#define MB_ENABLE_FUNC_Read_Discrete_Inputs     1
-#define MB_ENABLE_FUNC_Read_Holding_Registers   1
-#define MB_ENABLE_FUNC_Read_Input_Registers     1
-#define MB_ENABLE_FUNC_Write_Single_Coil        1
-#define MB_ENABLE_FUNC_Write_Single_Register    1
-#define MB_ENABLE_FUNC_Write_Multiple_Coils     1
-#define MB_ENABLE_FUNC_Write_Multiple_Registers 1
-
-
 mb_error_e mb_check_func(uint8_t func);
 mb_error_e mb_check_quantity(uint16_t Quantity);
 mb_error_e mb_check_on_off(uint16_t Value);

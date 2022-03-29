@@ -13,6 +13,9 @@ extern "C" {
 
 #include <stdint.h>
 
+// Comment that for release
+//#define MB_DEBUG
+
 // Mode List
 #define MB_MODE_MASTER  0
 #define MB_MODE_SLAVE   1
@@ -25,8 +28,22 @@ extern "C" {
 // Default SLAVE mode Device Address
 #define MB_DEFAULT_SLAVE_ADDRESS 		0x01
 
-// Comment that for release
-//#define MB_DEBUG
+// Listen slave address 0 but don't response as broadcast packet from master
+// Comment that for disable support broadcast packets
+#define MB_SLAVE_LISTEN_BROADCAST
+
+// Default Broadcast address
+#define MB_BROADCAST_ADDRESS 0
+
+// Enable or Disable Support Modbus Function for Slave Mode
+#define MB_ENABLE_FUNC_Read_Coils               1
+#define MB_ENABLE_FUNC_Read_Discrete_Inputs     1
+#define MB_ENABLE_FUNC_Read_Holding_Registers   1
+#define MB_ENABLE_FUNC_Read_Input_Registers     1
+#define MB_ENABLE_FUNC_Write_Single_Coil        1
+#define MB_ENABLE_FUNC_Write_Single_Register    1
+#define MB_ENABLE_FUNC_Write_Multiple_Coils     1
+#define MB_ENABLE_FUNC_Write_Multiple_Registers 1
 
 // ModBus Fanctions
 typedef enum{
@@ -92,13 +109,17 @@ typedef struct{
 // Set MODBUS Config Public
 extern mb_config_s MB_Config;
 
+#define mb_tx_packet_handler   mb_link_prepare_tx_data
+#define mb_rx_new_data         mb_link_check_new_data
+#define mb_rx_timeout_handler  mb_link_reset_rx_buffer
+
 // If Defined Mode as Slave
 #if(MB_MODE==MB_MODE_SLAVE)
 
 void             mb_slave_address_set(uint8_t Address);						// Set Slave Address
 uint8_t          mb_slave_address_get(void);								// Get Slave Address
 
-void             mb_error_handler(mb_functions_e func,mb_error_e err);		// Make and Send ERROR Packet in Slave Mode
+void             mb_error_handler(mb_packet_s* Packet,mb_error_e err);		// Make and Send ERROR Packet in Slave Mode
 
 // If Defined Mode as Master
 #elif(MB_MODE==MB_MODE_MASTER)

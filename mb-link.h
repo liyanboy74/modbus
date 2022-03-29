@@ -18,7 +18,6 @@ typedef enum{
     MB_LINK_ERROR_Data_Size,
     MB_LINK_ERROR_CRC,
     MB_LINK_ERROR_FUNC,
-
 }mb_link_error_e;
 
 void             mb_link_check_new_data(uint8_t Byte);

@@ -51,7 +51,7 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
 
     #if(MB_MODE==MB_MODE_SLAVE)
 
-        MB_LINK_Tx_Buffer[0]=mb_slave_address_get();
+        MB_LINK_Tx_Buffer[0]=MB_Config.address;
 
         if(Packet.type==MB_PACKET_TYPE_Slave_Responce_Var)
         {
@@ -219,7 +219,11 @@ void mb_link_check_new_data(uint8_t Byte)
 
         if(!MB_LINK_Rx_Buffer_Index) // Device Address
         {
-            if(mb_slave_address_get()==Byte)
+            if(MB_Config.address==Byte
+            #ifdef MB_SLAVE_LISTEN_BROADCAST
+            || Byte == MB_BROADCAST_ADDRESS
+            #endif
+            )
             {
                 MB_LINK_Rx_Buffer[MB_LINK_Rx_Buffer_Index]=Byte;
                 MB_LINK_Rx_Buffer_Index++;
