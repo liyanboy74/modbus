@@ -22,7 +22,7 @@ mb_link_error_e MB_LINK_Status=MB_LINK_OK;
 void mb_link_error_handler(mb_link_error_e err)
 {
     MB_LINK_Status=err;
-    #ifdef MB_DEBUG
+    #ifdef MB_LINK_DEBUG
     printf("MB_LINK: ");
     switch(err)
     {
@@ -49,7 +49,7 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
 
     MB_LINK_Tx_Buffer[1]=Packet.func;
 
-    #if(MB_MODE==MB_MODE_SLAVE)
+    #if (MB_MODE==MB_MODE_SLAVE) || defined MB_DEBUG
 
         MB_LINK_Tx_Buffer[0]=MB_Config.address;
 
@@ -82,8 +82,8 @@ void mb_link_prepare_tx_data(mb_packet_s Packet)
             mb_link_send(MB_LINK_Tx_Buffer,5);
             return;
         }
-
-    #elif(MB_MODE==MB_MODE_MASTER)
+    #endif
+    #if (MB_MODE==MB_MODE_MASTER) || defined MB_DEBUG
 
         MB_LINK_Tx_Buffer[0]=Packet.device_address;
         if(Packet.type==MB_PACKET_TYPE_Master_Request_Fix)

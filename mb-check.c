@@ -94,7 +94,7 @@ mb_error_e mb_check_table_holding_registers_address(uint16_t StartAd,uint16_t Qu
 
 mb_error_e mb_check_on_off(uint16_t Value)
 {
-    if(Value != 0xff00 && Value!=0x000) return MB_ERROR_ILLEGAL_DATA_VALUE;
+    if(Value != MB_COIL_ON && Value != MB_COIL_OFF) return MB_ERROR_ILLEGAL_DATA_VALUE;
     return MB_OK;
 }
 

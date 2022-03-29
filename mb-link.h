@@ -7,6 +7,8 @@ extern "C" {
 
 #include <stdint.h>
 
+//#define MB_LINK_DEBUG
+
 #define MB_LINK_Rx_Buffer_Size     64 //MAx 256
 #define MB_LINK_Tx_Buffer_Size     64 //MAx 256
 

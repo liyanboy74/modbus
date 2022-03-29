@@ -2,7 +2,7 @@ TARGET = mb
 
 CC = gcc
 
-DEFINES = -DMB_DEBUG
+DEFINES =
 WARN = -Wall
 
 SRC = *.c

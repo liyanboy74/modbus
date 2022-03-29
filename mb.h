@@ -28,7 +28,7 @@ extern "C" {
 // Default SLAVE mode Device Address
 #define MB_DEFAULT_SLAVE_ADDRESS 		0x01
 
-// Listen slave address 0 but don't response as broadcast packet from master
+// Listen slave address MB_BROADCAST_ADDRESS but don't response to master
 // Comment that for disable support broadcast packets
 #define MB_SLAVE_LISTEN_BROADCAST
 
@@ -44,6 +44,9 @@ extern "C" {
 #define MB_ENABLE_FUNC_Write_Single_Register    1
 #define MB_ENABLE_FUNC_Write_Multiple_Coils     1
 #define MB_ENABLE_FUNC_Write_Multiple_Registers 1
+
+#define MB_COIL_ON  (0xff00)
+#define MB_COIL_OFF (0x0000)
 
 // ModBus Fanctions
 typedef enum{

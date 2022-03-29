@@ -7,7 +7,7 @@ extern "C" {
 
 #include "mb.h"
 
-#if(MB_MODE==MB_MODE_MASTER)
+#if (MB_MODE==MB_MODE_MASTER) || defined MB_DEBUG
 
 mb_packet_s mb_packet_request_read_coil(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity);
 mb_packet_s mb_packet_request_read_discrete_inputs(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity);
@@ -18,7 +18,8 @@ mb_packet_s mb_packet_request_write_single_register(uint8_t DeviceAddress,uint16
 mb_packet_s mb_packet_request_write_multiple_coils(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data);
 mb_packet_s mb_packet_request_write_multiple_registers(uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data);
 
-#elif(MB_MODE==MB_MODE_SLAVE)
+#endif
+#if (MB_MODE==MB_MODE_SLAVE) || defined MB_DEBUG
 
 mb_packet_s mb_packet_response_read_coil(uint8_t len,uint8_t *Data);
 mb_packet_s mb_packet_response_read_discrete_inputs(uint8_t len,uint8_t *Data);
