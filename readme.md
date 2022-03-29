@@ -31,3 +31,8 @@ Follow below steps:
 - `mb-process` : Process received packets
 - `mb-table` : Database
 
+### Run Test.c
+After installing `GCC` and `Make` , run below command:
+```
+make test
+```
