@@ -182,3 +182,18 @@ void mb_rx_packet_handler(mb_packet_s Packet)
 
     #endif
 }
+
+void mb_tx_packet_handler(mb_packet_s Packet)
+{
+    mb_link_prepare_tx_data(Packet);
+}
+
+void mb_rx_new_data(uint8_t Byte)
+{
+    mb_link_check_new_data(Byte);
+}
+
+void mb_rx_timeout_handler(void)
+{
+    mb_link_reset_rx_buffer();
+}

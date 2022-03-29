@@ -112,10 +112,6 @@ typedef struct{
 // Set MODBUS Config Public
 extern mb_config_s MB_Config;
 
-#define mb_tx_packet_handler   mb_link_prepare_tx_data
-#define mb_rx_new_data         mb_link_check_new_data
-#define mb_rx_timeout_handler  mb_link_reset_rx_buffer
-
 // If Defined Mode as Slave
 #if(MB_MODE==MB_MODE_SLAVE)
 
