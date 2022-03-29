@@ -34,7 +34,7 @@ const uint8_t SlaveAns[TestNum][9]={
     {0x01,0x04,0x02,0x00,0x00,0xb9,0x30},
     {0x01,0x0f,0x00,0x00,0x00,0x10,0x54,0x07},
     {0x01,0x01,0x02,0x00,0xff,0xf9,0xbc},
-    {0x01,0x10,0x00,0x01,0x00,0x01,0x50,0x09},
+    //{0x01,0x10,0x00,0x01,0x00,0x01,0x50,0x09},
     {0x01,0x03,0x02,0x00,0xff,0xf8,0x04},
 };
 
@@ -56,6 +56,16 @@ void bar()
     int i;
     for(i=0;i<50;i++)putchar('=');
     printf("\n");
+}
+
+uint8_t datacmp(const uint8_t* Data1,const uint8_t* Data2,uint8_t Len)
+{
+    int i;
+    for(i=0;i<Len;i++)
+    {
+        if(Data1[i]!=Data2[i])return 1;
+    }
+    return 0;
 }
 
 #if(MB_MODE==MB_MODE_MASTER)
@@ -89,7 +99,7 @@ void send_data(uint8_t *Data,uint8_t Len)
     int i;
     printf("TX: ");
     for(i=0;i<Len;i++)printf("%02x ",Data[i]);
-    if(strncmp((char*)Data,(char*)MasterReq[AnsIndex++],Len)==0)
+    if(datacmp(Data,MasterReq[AnsIndex++],Len)==0)
     {
         printf("\t\tOK");
         AnsPIndex++;
@@ -105,8 +115,7 @@ void send_data(uint8_t *Data,uint8_t Len)
     int i;
     printf("TX: ");
     for(i=0;i<Len;i++)printf("%02x ",Data[i]);
-    if(AnsIndex==8)AnsIndex++; // Break Broadcast packet
-    if(strncmp((char*)Data,(char*)SlaveAns[AnsIndex++],Len)==0)
+    if(datacmp(Data,SlaveAns[AnsIndex++],Len)==0)
     {
         printf("\t\tOK");
         AnsPIndex++;
@@ -173,7 +182,7 @@ int main()
     bar();
     printf("Process received packet from slave:\n\n");
 
-    for(i=0;i<TestNum;i++)
+    for(i=0;i<TestNum-1;i++)
     {
         for(j=0;j<9;j++)
         {
@@ -182,7 +191,7 @@ int main()
         mb_rx_timeout_handler();
     }
 
-    printf("\nSTATUS %02d/%02d %s\n",MPIndex,TestNum,(TestNum==MPIndex)?"PASS":"FAIL");
+    printf("\nSTATUS %02d/%02d %s\n",MPIndex,TestNum-1,(TestNum-1==MPIndex)?"PASS":"FAIL");
 
     #endif
 
