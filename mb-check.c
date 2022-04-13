@@ -44,7 +44,7 @@ mb_error_e mb_check_func(uint8_t func)
 
 mb_error_e mb_check_quantity(uint16_t Quantity)
 {
-    if(Quantity>=0x0001&&Quantity<=0x07d0)return MB_OK;
+    if(Quantity>=MB_MIN_QUANTITY&&Quantity<=MB_MAX_QUANTITY)return MB_OK;
     return MB_ERROR_ILLEGAL_DATA_VALUE;
 }
 

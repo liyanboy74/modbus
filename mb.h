@@ -45,8 +45,11 @@ extern "C" {
 #define MB_ENABLE_FUNC_Write_Multiple_Coils     1
 #define MB_ENABLE_FUNC_Write_Multiple_Registers 1
 
-#define MB_COIL_ON  (0xff00)
-#define MB_COIL_OFF (0x0000)
+#define MB_COIL_ON  0xff00
+#define MB_COIL_OFF 0x0000
+
+#define MB_MIN_QUANTITY 0x0001
+#define MB_MAX_QUANTITY 0x07d0
 
 // ModBus Fanctions
 typedef enum{
