@@ -16,8 +16,10 @@ Follow below steps:
 **Note:** The library don't handle Rx Timout error! the `mb_rx_timeout_handler()` must be call for reset rx buffer index .
 
 ### Examples
-- [STM32 Slave MODBUS Example](https://github.com/ioelectro/modbus-stm32-slave-example.git)
+- [STM32 MODBUS Slave Example](https://github.com/ioelectro/modbus-stm32-slave-example.git)
+- [STM8 MODBUS Slave Example](https://github.com/ioelectro/modbus-stm8-slave-example)
 - [AVR MODBUS Network Example](https://github.com/ioelectro/modbus-avr-example.git)
+
 
 ### File Description
 **Common**
