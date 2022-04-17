@@ -9,7 +9,7 @@ extern "C" {
 
 typedef enum{
 	MB_CRC_OK=0,
-	MB_CRC_ERROR=1,
+	MB_CRC_ERROR=1
 }mb_crc_e;
 
 uint16_t mb_crc16 (const uint8_t *nData, uint16_t wLength);

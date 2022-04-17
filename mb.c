@@ -12,7 +12,7 @@
 #include "mb-link.h"
 #include "mb-packet.h"
 
-mb_config_s MB_Config={.address=MB_DEFAULT_SLAVE_ADDRESS};
+mb_config_s MB_Config={MB_DEFAULT_SLAVE_ADDRESS};
 
 #if(MB_MODE==MB_MODE_SLAVE)
 

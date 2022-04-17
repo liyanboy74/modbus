@@ -14,6 +14,8 @@
 
 uint8_t MB_PROCESS_Buffer[MB_PROCESS_Buffer_Size];
 
+#define MB_PROCESS_MAX_DATA (MB_PROCESS_Buffer_Size-2)
+
 mb_error_e mb_slave_process_read_coils(mb_packet_s* Packet)
 {
     uint16_t i,Start,Size;
@@ -22,7 +24,7 @@ mb_error_e mb_slave_process_read_coils(mb_packet_s* Packet)
     Start=Packet->u16_1;
     End=(uint32_t)Packet->u16_2+Start;
 
-    for(i=0;Start<End;Start++,i++)
+    for(i=0;Start<End&&(i/8)<MB_PROCESS_MAX_DATA;Start++,i++)
     {
         if(i%8==0)MB_PROCESS_Buffer[i/8]=0;
         MB_PROCESS_Buffer[i/8]|=mb_table_read_bit(TBALE_Coils,Start)<<(i%8);
@@ -46,7 +48,7 @@ mb_error_e mb_slave_process_read_discrere_inputs(mb_packet_s* Packet)
     Start=Packet->u16_1;
     End=(uint32_t)Packet->u16_2+Start;
 
-    for(i=0;Start<End;Start++,i++)
+    for(i=0;Start<End&&(i/8)<MB_PROCESS_MAX_DATA;Start++,i++)
     {
         if(i%8==0)MB_PROCESS_Buffer[i/8]=0;
         MB_PROCESS_Buffer[i/8]|=mb_table_read_bit(TBALE_Discretes_Input,Start)<<(i%8);
@@ -70,7 +72,7 @@ mb_error_e mb_slave_process_read_holding_registers(mb_packet_s* Packet)
     Start=Packet->u16_1;
     End=(uint32_t)Packet->u16_2+Start;
 
-    for(i=0;Start<End;Start++,i+=2)
+    for(i=0;Start<End&&i<MB_PROCESS_MAX_DATA;Start++,i+=2)
     {
         Temp=mb_table_read(TABLE_Holding_Registers,Start);
 
@@ -93,7 +95,7 @@ mb_error_e mb_slave_process_read_input_registers(mb_packet_s* Packet)
     Start=Packet->u16_1;
     End=(uint32_t)Packet->u16_2+Start;
 
-    for(i=0;Start<End;Start++,i+=2)
+    for(i=0;Start<End&&i<MB_PROCESS_MAX_DATA;Start++,i+=2)
     {
         Temp=mb_table_read(TBALE_Input_Registers,Start);
 

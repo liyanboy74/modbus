@@ -9,7 +9,7 @@ extern "C" {
 
 #if(MB_MODE==MB_MODE_SLAVE)
 
-#define MB_PROCESS_Buffer_Size 64
+#define MB_PROCESS_Buffer_Size 32
 
 mb_error_e mb_slave_process_read_coils(mb_packet_s* Packet);
 mb_error_e mb_slave_process_read_discrere_inputs(mb_packet_s* Packet);

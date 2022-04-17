@@ -60,7 +60,7 @@ typedef enum{
 	MB_FUNC_Write_Single_Coil			= 0x05,
 	MB_FUNC_Write_Single_Register		= 0x06,
 	MB_FUNC_Write_Multiple_Coils		= 0x0f,
-	MB_FUNC_Write_Multiple_Registers	= 0x10,
+	MB_FUNC_Write_Multiple_Registers	= 0x10
 }mb_functions_e;
 
 // MODBUS Exception Codes
@@ -74,7 +74,7 @@ typedef enum{
 	MB_ERROR_SLAVE_DEVICE_BUSY 			= 0x06,
 	MB_ERROR_MEMORY_PARITY 				= 0x08,
 	MB_ERROR_GATEWAY_PATH_UNAVAILABLE 	= 0x0A,
-	MB_ERROR_FAILED_TO_RESPOND 			= 0x0B,
+	MB_ERROR_FAILED_TO_RESPOND 			= 0x0B
 }mb_error_e;
 
 // MODBUS Packet Type
@@ -84,7 +84,7 @@ typedef enum{
 	MB_PACKET_TYPE_Slave_Responce_Var,
 	MB_PACKET_TYPE_Slave_Responce_Fix,
 	MB_PACKET_TYPE_Master_Request_Fix,
-	MB_PACKET_TYPE_Master_Request_Var,
+	MB_PACKET_TYPE_Master_Request_Var
 }mb_packet_type_e;
 
 // MODBUS Packet Struct
