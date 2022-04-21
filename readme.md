@@ -3,6 +3,26 @@ Modbus RTU C library for embedded systems.
 
 ![MBLib-data-flow](https://user-images.githubusercontent.com/64005694/154830661-b1cc3740-ec50-44c9-9330-b34d01b1224c.svg)
 
+### Requirements
+**Memory**
+<table>
+    <tr>
+        <td></td>
+        <td>Flash</td>
+        <td>RAM</td>
+    </tr>
+    <tr>
+        <td><strong>Master</td>
+        <td>2K</td>
+        <td>64</td>
+    </tr>
+    <tr>
+        <td><strong>Slave</td>
+        <td>4K</td>
+        <td>96 *</td>
+    </tr>
+</table>
+* Without database size, default +68 Byte.
 
 ### Guide 
 
