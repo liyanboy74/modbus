@@ -31,7 +31,6 @@ Follow below steps:
 - Send Byte-by-Byte received data to `mb_rx_new_data()` for processing .
 - Use `mb_set_tx_handler()` for set callback for transmit data from MODBUS layer.
 - In master mode, received packet don't process automatically! so the callback must be set by `mb_set_master_process_handler()` .
-- It's recommended to use [FIFO](https://github.com/liyanboy74/fifo) on input data before sending to MODBUS .
 
 **Note:** The library don't handle Rx Timout error! the `mb_rx_timeout_handler()` must be call for reset rx buffer index .
 
