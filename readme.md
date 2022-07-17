@@ -13,12 +13,12 @@ Modbus RTU C library for embedded systems.
     </tr>
     <tr>
         <td><strong>Master</td>
-        <td>2K</td>
+        <td>~2K</td>
         <td>64</td>
     </tr>
     <tr>
         <td><strong>Slave</td>
-        <td>4K</td>
+        <td>~4K</td>
         <td>96 *</td>
     </tr>
 </table>
