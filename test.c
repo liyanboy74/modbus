@@ -129,7 +129,7 @@ void send_data(uint8_t *Data,uint8_t Len)
 
 int main()
 {
-    int i,j;
+    int i,j,ret=1;
 
     //Set Handler for transmit data from MODBUS layer
     mb_set_tx_handler(&send_data);
@@ -151,6 +151,7 @@ int main()
     }
 
     printf("\nSTATUS %02d/%02d %s\n",AnsPIndex+1,TestNum,(TestNum==(AnsPIndex+1))?"PASS":"FAIL");
+    if(TestNum==(AnsPIndex+1))ret=0;
 
     #elif(MB_MODE==MB_MODE_MASTER)
 
@@ -192,10 +193,11 @@ int main()
     }
 
     printf("\nSTATUS %02d/%02d %s\n",MPIndex,TestNum-1,(TestNum-1==MPIndex)?"PASS":"FAIL");
+    if((TestNum-1==MPIndex))ret=0;
 
     #endif
 
     bar();
 
-    return 0;
+    return ret;
 }

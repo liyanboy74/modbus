@@ -7,7 +7,9 @@ WARN = -Wall
 
 SRC = *.c
 
-default:
+default: build
+
+build:
 	$(CC) $(WARN) $(SRC) $(DEFINES) -o $(TARGET)
 
 clean:
@@ -15,7 +17,7 @@ clean:
 
 test:
 	$(CC) $(WARN) $(SRC) $(DEFINES) -DMB_MODE=MB_MODE_SLAVE -o $(TARGET)
-	$(TARGET)
+	./$(TARGET)
 	$(CC) $(WARN) $(SRC) $(DEFINES) -DMB_MODE=MB_MODE_MASTER -o $(TARGET)
-	$(TARGET)
+	./$(TARGET)
 
