@@ -22,7 +22,7 @@ typedef enum{
     MB_LINK_ERROR_FUNC
 }mb_link_error_e;
 
-void             mb_link_check_new_data(uint8_t Byte);
+void             mb_link_check_new_data(uint8_t oneByte);
 void             mb_link_send(uint8_t *Data,uint8_t Len);
 
 void             mb_link_reset_rx_buffer(void);
