@@ -66,7 +66,6 @@ void mb_rtu_reset_rx_buffer(void)
         MB_RTU_Rx_Buffer_Index=0;
         MB_RTU_Loop_C=0;
         MB_RTU_Func=0;
-        // MB_RTU_Packet_Type=MB_PACKET_TYPE_UNKNOWN;
     }
 }
 
