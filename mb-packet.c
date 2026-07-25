@@ -87,7 +87,8 @@ mb_packet_s mb_packet_request_write_multiple_registers(uint8_t DeviceAddress,uin
 mb_packet_s mb_packet_type_slave_responce_var(mb_function_e function,uint8_t len,uint8_t *Data)
 {
 	int i;
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= function;
 	Packet.length= len+1;
 	Packet.payload[0]=len;
@@ -98,7 +99,8 @@ mb_packet_s mb_packet_type_slave_responce_var(mb_function_e function,uint8_t len
 
 mb_packet_s mb_packet_type_slave_responce_fix(mb_function_e function,uint16_t w1,uint16_t w2)
 {
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= function;
 	Packet.length=4;
 	Packet.payload[0]=(uint8_t)(w1>>8)&0xff;
@@ -110,7 +112,8 @@ mb_packet_s mb_packet_type_slave_responce_fix(mb_function_e function,uint16_t w1
 
 mb_packet_s mb_packet_response_read_exeption_status(uint8_t Status)
 {
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= MB_FUNC_Read_Exception_Status;
 	Packet.length=1;
 	Packet.payload[0]=Status;
@@ -119,9 +122,9 @@ mb_packet_s mb_packet_response_read_exeption_status(uint8_t Status)
 
 mb_packet_s mb_packet_response_read_device_identification(uint8_t o_id)
 {
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
-
 	uint8_t i,l;
+	mb_packet_s Packet;
+	
 	const char *info[]={
 		MB_DEVICE_IDENTIFICATION_VENDOR,
 		MB_DEVICE_IDENTIFICATION_PRODUCT,
@@ -129,7 +132,8 @@ mb_packet_s mb_packet_response_read_device_identification(uint8_t o_id)
 	};
 
 	uint8_t object_count = sizeof(info) / sizeof(info[0]);
-
+	
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= MB_FUNC_Encapsulated_Interface;
 	Packet.length=0;
 
@@ -148,7 +152,6 @@ mb_packet_s mb_packet_response_read_device_identification(uint8_t o_id)
 		memcpy(&Packet.payload[Packet.length],info[i],l);
 		Packet.length+=l;
 	}
-
 	return Packet;
 }
 
@@ -199,8 +202,8 @@ mb_packet_s mb_packet_response_write_multiple_registers(uint16_t StartAd,uint16_
 
 mb_packet_s mb_packet_error(mb_function_e Func,mb_error_e Exeption_Code)
 {
-	// Packet.type=MB_PACKET_TYPE_ERROR;
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= 0x80|Func;
 	Packet.length=1;
 	Packet.payload[0]= Exeption_Code;
