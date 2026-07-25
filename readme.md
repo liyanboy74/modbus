@@ -51,7 +51,7 @@ Received UART bytes must be passed to the library byte-by-byte:
 ```c
 mb_rx_new_data(Byte);
 ```
-Since the library does not generate timeout events internally, your application must call the timeout handler whenever an RTU frame timeout occurs:
+Since the library does not generate timeout events internally, your application must call the timeout handler whenever an RTU frame timeout occurs ( for reset rx buffer index if received packet was brok! ) :
 ```c
 mb_rx_timeout_handler();
 ```
