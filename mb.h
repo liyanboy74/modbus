@@ -122,9 +122,7 @@ typedef struct{
 	uint8_t address;
     uint8_t status;
 	void (*tx_handler)(uint8_t *,uint16_t);
-	#if(MB_MODE==MB_MODE_MASTER)
 	void (*master_process_handler)(mb_packet_s);
-	#endif
 }mb_config_s;
 
 // Set MODBUS Config Public

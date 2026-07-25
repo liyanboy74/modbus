@@ -11,8 +11,7 @@
 #include "mb-process.h"
 #include "mb-packet.h"
 
-mb_config_s mb={.address=MB_DEFAULT_SLAVE_ADDRESS,\
-                .status=0};
+mb_config_s mb={MB_DEFAULT_SLAVE_ADDRESS,0,0,0};
 
 #if(MB_MODE==MB_MODE_SLAVE)
 
