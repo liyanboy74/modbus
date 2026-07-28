@@ -110,16 +110,35 @@ mb_packet_s mb_packet_type_slave_responce_fix(mb_function_e function,uint16_t w1
 	return Packet;
 }
 
-mb_packet_s mb_packet_response_read_exeption_status(uint8_t Status)
+#if MB_ENABLE_FUNC_Read_Exception_Status
+mb_packet_s mb_packet_response_read_exeption_status(void)
 {
 	mb_packet_s Packet;
 	Packet.payload=MB_PACKET_Buffer;
 	Packet.function= MB_FUNC_Read_Exception_Status;
 	Packet.length=1;
-	Packet.payload[0]=Status;
+	Packet.payload[0]=mb.status;
 	return Packet;
 }
+#endif
 
+#if MB_ENABLE_FUNC_Report_Server_ID
+mb_packet_s mb_packet_response_report_server_id(void)
+{
+	mb_packet_s Packet;
+	const char *add_info=MB_SERVER_REPORT_ADD_INFO;
+	Packet.payload=MB_PACKET_Buffer;
+	Packet.function= MB_FUNC_Report_Server_ID;
+	Packet.length=3+(uint8_t)strlen(add_info);
+	Packet.payload[0]=(uint8_t)(Packet.length-1);//Len
+	Packet.payload[1]=mb.server_id;
+	Packet.payload[2]=0xff;//or 0x00 
+	strcpy((char*)&Packet.payload[3],add_info);
+	return Packet;
+}
+#endif
+
+#if MB_ENABLE_FUNC_Encapsulated_Interface
 mb_packet_s mb_packet_response_read_device_identification(uint8_t o_id)
 {
 	uint8_t i,l;
@@ -154,6 +173,7 @@ mb_packet_s mb_packet_response_read_device_identification(uint8_t o_id)
 	}
 	return Packet;
 }
+#endif
 
 mb_packet_s mb_packet_response_read_coil(uint8_t len,uint8_t *Data)
 {

@@ -73,11 +73,11 @@ void mb_rtu_check_new_data(uint8_t oneByte)
 {
     #if(MB_MODE==MB_MODE_MASTER)
 
-        if(!MB_RTU_Rx_Buffer_Index) // Device Address
+        if(!MB_RTU_Rx_Buffer_Index) //Device Address
         {
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
-        }else if(MB_RTU_Rx_Buffer_Index==1) // Func
+        }else if(MB_RTU_Rx_Buffer_Index==1) //Func
         {
             MB_RTU_Func=oneByte;
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
@@ -92,7 +92,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
             {
                 if(mb_crc_check(MB_RTU_Rx_Buffer,5)==MB_CRC_OK)
                 {
-                    // OK -> Remove CRC & Go!
+                    //OK -> Remove CRC & Go!
                     mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                 }
                 else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -109,7 +109,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 case MB_FUNC_Read_Discrete_Inputs:
                 case MB_FUNC_Read_Holding_Registers:
                 case MB_FUNC_Read_Input_Registers:
-                    if(MB_RTU_Rx_Buffer_Index==2) // Size of Data Bytes
+                    if(MB_RTU_Rx_Buffer_Index==2) //Size of Data Bytes
                     {
                         if(oneByte>MB_RTU_Rx_MDBL)
                         {
@@ -123,15 +123,15 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                             MB_RTU_Rx_Buffer_Index++;
                             MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
                         }
-                    }else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) // Data + CRC
+                    }else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
                     {
                         MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                         MB_RTU_Rx_Buffer_Index++;
-                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) // Data Ready
+                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
                         {
                             if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
                             {
-                                // OK -> Remove CRC & Go!
+                                //OK -> Remove CRC & Go!
                                 mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                             }
                             else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -153,7 +153,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                     {
                         if(mb_crc_check(MB_RTU_Rx_Buffer,8)==MB_CRC_OK)
                         {
-                            // OK -> Remove CRC & Go!
+                            //OK -> Remove CRC & Go!
                             mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                         }
                         else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -162,7 +162,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                     }
                 break;
                 
-                // MB Func Not Match!
+                //MB Func Not Match!
                 default:
                     mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
                     mb_rtu_reset_rx_buffer();
@@ -173,7 +173,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
 
     #elif(MB_MODE==MB_MODE_SLAVE)
 
-        if(!MB_RTU_Rx_Buffer_Index) // Device Address
+        if(!MB_RTU_Rx_Buffer_Index) //Device Address
         {
             if(mb.address==oneByte
             #ifdef MB_SLAVE_LISTEN_BROADCAST
@@ -186,17 +186,17 @@ void mb_rtu_check_new_data(uint8_t oneByte)
             }
             else mb_rtu_error_handler(MB_RTU_ERROR_Address);
         }
-        else if(MB_RTU_Rx_Buffer_Index==1) // Func
+        else if(MB_RTU_Rx_Buffer_Index==1) //Func
         {
             MB_RTU_Func=oneByte;
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
         }
-        else // Check Func
+        else //Check Func
         {
             switch (MB_RTU_Func)
             {
-                //master request var
+                //Master request var
                 case MB_FUNC_Write_Multiple_Coils:
                 case MB_FUNC_Write_Multiple_Registers:
                 case MB_FUNC_Read_Write_Multiple_Registers:
@@ -219,15 +219,16 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                             MB_RTU_Rx_Buffer_Index++;
                             MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
                         }
-                    }else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) // Data + CRC
+                    }
+                    else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
                     {
                         MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                         MB_RTU_Rx_Buffer_Index++;
-                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) // Data Ready
+                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
                         {
                             if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
                             {
-                                // OK -> Remove CRC & Go!
+                                //OK -> Remove CRC & Go!
                                 mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                             }
                             else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -237,7 +238,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                     }
                 
                 break;
-                //master request fix
+                //Master request fix
                 case MB_FUNC_Read_Coils:
                 case MB_FUNC_Read_Discrete_Inputs:
                 case MB_FUNC_Read_Holding_Registers:
@@ -253,7 +254,7 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                         {
                             if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
                             {
-                                // OK -> Remove CRC & Go!
+                                //OK -> Remove CRC & Go!
                                 mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                             }
                             else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -263,15 +264,16 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                     }
                 break;
 
-                #if MB_ENABLE_FUNC_Read_Exception_Status
+                //Just Func
                 case MB_FUNC_Read_Exception_Status:
+                case MB_FUNC_Report_Server_ID:
                     MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                     MB_RTU_Rx_Buffer_Index++;
                     if(MB_RTU_Rx_Buffer_Index>=4)
                     {
                         if(mb_crc_check(MB_RTU_Rx_Buffer,4)==MB_CRC_OK)
                         {
-                            // OK -> Remove CRC & Go!
+                            //OK -> Remove CRC & Go!
                             mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                         }
                         else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
@@ -279,10 +281,9 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                         return;
                     }
                 break;
-                #endif
             
                 default:
-                // MB Func Not Match!
+                //MB Func Not Match!
                 mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
                 mb_rtu_reset_rx_buffer();
                 return;
@@ -304,7 +305,7 @@ mb_packet_s mb_rtu_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Len)
     return Packet;
 }
 
-// RTU Transport
+//RTU Transport
 void mb_tx_packet_handler(mb_packet_s Packet)
 {
     mb_rtu_prepare_tx_data(Packet);

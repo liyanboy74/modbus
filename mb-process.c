@@ -220,6 +220,7 @@ mb_error_e mb_slave_process_read_write_multiple_registers(mb_packet_s* Packet)
     return MB_OK;
 }
 
+#if MB_ENABLE_FUNC_Encapsulated_Interface
 mb_error_e mb_slave_process_read_device_identification(mb_packet_s* Packet)
 {
     #ifdef MB_SLAVE_LISTEN_BROADCAST
@@ -228,14 +229,28 @@ mb_error_e mb_slave_process_read_device_identification(mb_packet_s* Packet)
     mb_tx_packet_handler(mb_packet_response_read_device_identification(Packet->payload[2]));
     return MB_OK;
 }
+#endif
 
+#if MB_ENABLE_FUNC_Read_Exception_Status
 mb_error_e mb_slave_process_read_exeption_status(mb_packet_s* Packet)
 {
     #ifdef MB_SLAVE_LISTEN_BROADCAST
     if(Packet->unit_id != MB_BROADCAST_ADDRESS)
     #endif
-    mb_tx_packet_handler(mb_packet_response_read_exeption_status(mb.status));
+    mb_tx_packet_handler(mb_packet_response_read_exeption_status());
     return MB_OK;
 }
+#endif
+
+#if MB_ENABLE_FUNC_Report_Server_ID
+mb_error_e mb_slave_process_report_server_id(mb_packet_s* Packet)
+{
+    #ifdef MB_SLAVE_LISTEN_BROADCAST
+    if(Packet->unit_id != MB_BROADCAST_ADDRESS)
+    #endif
+    mb_tx_packet_handler(mb_packet_response_report_server_id());
+    return MB_OK;
+}
+#endif
 
 #endif

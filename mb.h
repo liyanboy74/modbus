@@ -29,10 +29,6 @@ extern "C" {
 // Default SLAVE mode Device Address
 #define MB_DEFAULT_SLAVE_ADDRESS 		0x01
 
-#define MB_DEVICE_IDENTIFICATION_VENDOR                 "VENDOR"
-#define MB_DEVICE_IDENTIFICATION_PRODUCT                "PRODUCT"
-#define MB_DEVICE_IDENTIFICATION_REVISION               "1.0"
-
 // Listen slave address MB_BROADCAST_ADDRESS but don't response to master
 // Comment that for disable support broadcast packets
 #define MB_SLAVE_LISTEN_BROADCAST
@@ -55,11 +51,20 @@ extern "C" {
 #define MB_ENABLE_FUNC_Read_Write_Multiple_Registers    1
 #define MB_ENABLE_FUNC_Read_Exception_Status            1
 #define MB_ENABLE_FUNC_Encapsulated_Interface           1
+#define MB_ENABLE_FUNC_Report_Server_ID                 1
 
+#if MB_ENABLE_FUNC_Encapsulated_Interface
+    #define MB_DEVICE_IDENTIFICATION_VENDOR                 "VENDOR"
+    #define MB_DEVICE_IDENTIFICATION_PRODUCT                "PRODUCT"
+    #define MB_DEVICE_IDENTIFICATION_REVISION               "1.0"
+#endif
+
+#if MB_ENABLE_FUNC_Report_Server_ID
+    #define MB_SERVER_REPORT_ADD_INFO                       "LB74"
+#endif
 
 #define MB_COIL_ON  0xff00
 #define MB_COIL_OFF 0x0000
-
 
 #define MB_U16_AT(ptr) ((uint16_t)(((uint16_t)((ptr)[0]) << 8) | ((ptr)[1])))
 
@@ -121,6 +126,7 @@ typedef struct
 typedef struct{
 	uint8_t address;
     uint8_t status;
+    uint8_t server_id;
 	void (*tx_handler)(uint8_t *,uint16_t);
 	void (*master_process_handler)(mb_packet_s);
 }mb_config_s;
@@ -136,6 +142,9 @@ uint8_t         mb_slave_address_get(void);                                 // G
 
 void            mb_slave_status_set(uint8_t status);						// Set Slave status
 uint8_t         mb_slave_status_get(void);								    // Get Slave status
+
+void            mb_slave_set_server_id(uint8_t id);                         // Set Server id
+
 
 void            mb_error_handler(mb_packet_s* Packet,mb_error_e err);		// Make and Send ERROR Packet in Slave Mode
 

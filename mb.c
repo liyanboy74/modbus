@@ -11,7 +11,7 @@
 #include "mb-process.h"
 #include "mb-packet.h"
 
-mb_config_s mb={MB_DEFAULT_SLAVE_ADDRESS,0,0,0};
+mb_config_s mb={MB_DEFAULT_SLAVE_ADDRESS,0,0,0,0};
 
 #if(MB_MODE==MB_MODE_SLAVE)
 
@@ -25,6 +25,7 @@ uint8_t mb_slave_address_get(void)
     return mb.address;
 }
 
+#if MB_ENABLE_FUNC_Read_Exception_Status
 void mb_slave_status_set(uint8_t status)
 {
     mb.status=status;
@@ -33,6 +34,14 @@ uint8_t mb_slave_status_get(void)
 {
     return mb.status;
 }
+#endif
+
+#if MB_ENABLE_FUNC_Report_Server_ID
+void mb_slave_set_server_id(uint8_t id)
+{
+    mb.server_id=id;
+}
+#endif
 
 #elif(MB_MODE==MB_MODE_MASTER)
 
@@ -219,6 +228,14 @@ void mb_rx_packet_handler(mb_packet_s Packet)
             err=mb_slave_process_read_exeption_status(&Packet);
             if(err){mb_error_handler(&Packet,err);return;}
         } else
+        #endif
+
+        #if MB_ENABLE_FUNC_Report_Server_ID
+        if(Packet.function==MB_FUNC_Report_Server_ID)
+        {
+            err=mb_slave_process_report_server_id(&Packet);
+            if(err){mb_error_handler(&Packet,err);return;}
+        }
         #endif
 
         #if MB_ENABLE_FUNC_Encapsulated_Interface

@@ -56,6 +56,10 @@ mb_error_e mb_check_func(uint8_t func)
         #if MB_ENABLE_FUNC_Encapsulated_Interface
         case MB_FUNC_Encapsulated_Interface:break;
         #endif
+
+        #if MB_ENABLE_FUNC_Report_Server_ID
+        case MB_FUNC_Report_Server_ID:break;
+        #endif
         
         default:return MB_ERROR_ILLEGAL_FUNCTION;
     }
