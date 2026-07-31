@@ -23,7 +23,6 @@ typedef enum{
 typedef enum {
     MB_RTU_TYPE_VAR,
     MB_RTU_TYPE_FIX,
-    MB_RTU_TYPE_ERROR,
     MB_RTU_TYPE_NONE
 }mb_rtu_t_e;
 

@@ -18,7 +18,7 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
 {
     switch ((mb_function_e)f)
     {
-#if(MB_MODE==MB_MODE_MASTER)
+        #if(MB_MODE==MB_MODE_MASTER)
         case MB_FUNC_Read_Coils:
         case MB_FUNC_Read_Discrete_Inputs:
         case MB_FUNC_Read_Holding_Registers:
@@ -33,8 +33,7 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
             v->index=8;
             v->type=MB_RTU_TYPE_FIX;
             break;
-#elif(MB_MODE==MB_MODE_SLAVE)
-        
+        #elif(MB_MODE==MB_MODE_SLAVE)
         case MB_FUNC_Write_Multiple_Coils:
         case MB_FUNC_Write_Multiple_Registers:
             v->index=6;
@@ -64,19 +63,19 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
             v->index=4;
             v->type=MB_RTU_TYPE_FIX;
             break;
-#endif
+        #endif
         default:
             v->index=0;
             v->type=MB_RTU_TYPE_NONE;
         break;
     }
-#if(MB_MODE==MB_MODE_MASTER)
+    #if(MB_MODE==MB_MODE_MASTER)
     if(MB_RTU_Func & 0x80)
     {
-        v->type=MB_RTU_TYPE_ERROR;
+        v->type=MB_RTU_TYPE_FIX;
         v->index=5;
     }
-#endif
+    #endif
 }
 
 void mb_rtu_error_handler(mb_rtu_error_e err)
@@ -217,24 +216,6 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 mb_rtu_reset_rx_buffer();
             }
         }
-        #if(MB_MODE==MB_MODE_MASTER)
-        else if(clen.type==MB_RTU_TYPE_ERROR)
-        {
-            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-            MB_RTU_Rx_Buffer_Index++;
-
-            if(MB_RTU_Rx_Buffer_Index>=clen.index)
-            {
-                if(mb_crc_check(MB_RTU_Rx_Buffer,clen.index)==MB_CRC_OK)
-                {
-                    //OK -> Remove CRC & Go!
-                    mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                }
-                else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                mb_rtu_reset_rx_buffer();
-            }
-        }
-        #endif
         else
         {
             //MB Func Not Match!
