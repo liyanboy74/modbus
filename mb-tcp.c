@@ -1,3 +1,9 @@
+/*
+ MODBUS TCP Layer
+ By Liyanboy74
+ https://github.com/liyanboy74/modbus
+*/
+
 #include <stddef.h>
 #include "mb-tcp.h"
 

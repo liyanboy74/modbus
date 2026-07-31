@@ -1,5 +1,5 @@
 /*
- MODBUS Link Layer
+ MODBUS RTU Layer
  By Liyanboy74
  https://github.com/liyanboy74/modbus
 */
