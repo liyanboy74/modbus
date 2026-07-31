@@ -26,7 +26,7 @@ typedef struct {
     mb_rtu_t_e t;       //Type
 }mb_rtu_clen_s;
 
-void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
+static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
 {
     switch ((mb_function_e)f)
     {
