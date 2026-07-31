@@ -133,6 +133,27 @@ mb_error_e mb_slave_process_write_single_register(mb_packet_s* Packet)
     return MB_OK;
 }
 
+#if MB_ENABLE_FUNC_Mask_Write_Register
+mb_error_e mb_slave_process_mask_write_register(mb_packet_s* Packet)
+{
+    uint16_t temp,mAnd,mOr; 
+
+    temp=mb_table_read(TABLE_Holding_Registers,MB_U16_AT(Packet->payload));
+    mAnd=MB_U16_AT(Packet->payload+2);
+    mOr=MB_U16_AT(Packet->payload+4);
+
+    temp = (temp & mAnd) | (mOr & ~mAnd);
+    mb_table_write(TABLE_Holding_Registers,MB_U16_AT(Packet->payload),temp);
+
+    #ifdef MB_SLAVE_LISTEN_BROADCAST
+    if(Packet->unit_id != MB_BROADCAST_ADDRESS)
+    #endif
+
+    mb_tx_packet_handler(mb_packet_response_mask_write_register(Packet->payload));
+    return MB_OK;
+}
+#endif
+
 mb_error_e mb_slave_process_write_multiple_coils(mb_packet_s* Packet)
 {
     uint16_t Start;

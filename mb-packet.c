@@ -210,6 +210,20 @@ mb_packet_s mb_packet_response_write_single_register(uint16_t RAddress,uint16_t 
 	return mb_packet_type_slave_responce_fix(MB_FUNC_Write_Single_Register,RAddress,Data);
 }
 
+#if MB_ENABLE_FUNC_Mask_Write_Register
+mb_packet_s mb_packet_response_mask_write_register(uint8_t *payload)
+{
+	int i;
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
+	Packet.function= MB_FUNC_Mask_Write_Register;
+	Packet.length= 6;
+	for(i=0; i<Packet.length;i++)
+		Packet.payload[i]=payload[i];
+	return Packet;
+}
+#endif
+
 mb_packet_s mb_packet_response_write_multiple_coils(uint16_t StartAd,uint16_t Quantity)
 {
 	return mb_packet_type_slave_responce_fix(MB_FUNC_Write_Multiple_Coils,StartAd,Quantity);

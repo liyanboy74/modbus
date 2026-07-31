@@ -52,6 +52,7 @@ extern "C" {
 #define MB_ENABLE_FUNC_Read_Exception_Status            1
 #define MB_ENABLE_FUNC_Encapsulated_Interface           1
 #define MB_ENABLE_FUNC_Report_Server_ID                 1
+#define MB_ENABLE_FUNC_Mask_Write_Register              1
 
 #if MB_ENABLE_FUNC_Encapsulated_Interface
     #define MB_DEVICE_IDENTIFICATION_VENDOR                 "VENDOR"

@@ -255,6 +255,18 @@ void mb_rx_packet_handler(mb_packet_s Packet)
         } else
         #endif
 
+        #if MB_ENABLE_FUNC_Mask_Write_Register
+        if(Packet.function==MB_FUNC_Mask_Write_Register)
+        {
+            err=mb_check_table_holding_registers_address(MB_U16_AT(Packet.payload),0);
+            if(err){mb_error_handler(&Packet,err);return;}
+
+            err=mb_slave_process_mask_write_register(&Packet);
+            if(err){mb_error_handler(&Packet,err);return;}
+        }
+        else
+        #endif
+
         return;
 
     #elif(MB_MODE==MB_MODE_MASTER)

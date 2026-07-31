@@ -23,6 +23,8 @@ mb_error_e mb_slave_process_write_multiple_register(mb_packet_s* Packet);
 mb_error_e mb_slave_process_read_write_multiple_registers(mb_packet_s* Packet);
 mb_error_e mb_slave_process_read_device_identification(mb_packet_s* Packet);
 mb_error_e mb_slave_process_report_server_id(mb_packet_s* Packet);
+mb_error_e mb_slave_process_mask_write_register(mb_packet_s* Packet);
+
 
 #endif
 
