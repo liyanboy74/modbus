@@ -12,8 +12,84 @@ uint8_t MB_RTU_Tx_Buffer[MB_RTU_Tx_Buffer_Size];
 uint8_t MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Size];
 
 uint8_t MB_RTU_Rx_Buffer_Index=0,MB_RTU_Loop_C=0,MB_RTU_Func=0;
-
 mb_rtu_error_e MB_RTU_Status=MB_RTU_OK;
+
+typedef enum {
+    MB_RTU_TYPE_VAR,
+    MB_RTU_TYPE_FIX,
+    MB_RTU_TYPE_ERROR,
+    MB_RTU_TYPE_NONE
+}mb_rtu_t_e;
+
+typedef struct {
+    uint8_t n;          //Index
+    mb_rtu_t_e t;       //Type
+}mb_rtu_clen_s;
+
+void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
+{
+    switch ((mb_function_e)f)
+    {
+#if(MB_MODE==MB_MODE_MASTER)
+        case MB_FUNC_Read_Coils:
+        case MB_FUNC_Read_Discrete_Inputs:
+        case MB_FUNC_Read_Holding_Registers:
+        case MB_FUNC_Read_Input_Registers:
+            v->n=2;
+            v->t=MB_RTU_TYPE_VAR;
+            break;
+        case MB_FUNC_Write_Single_Coil:
+        case MB_FUNC_Write_Single_Register:
+        case MB_FUNC_Write_Multiple_Coils:
+        case MB_FUNC_Write_Multiple_Registers:
+            v->n=8;
+            v->t=MB_RTU_TYPE_FIX;
+            break;
+#elif(MB_MODE==MB_MODE_SLAVE)
+        
+        case MB_FUNC_Write_Multiple_Coils:
+        case MB_FUNC_Write_Multiple_Registers:
+            v->n=6;
+            v->t=MB_RTU_TYPE_VAR;
+            break;
+        case MB_FUNC_Read_Write_Multiple_Registers:
+            v->n=10;
+            v->t=MB_RTU_TYPE_VAR;
+            break;
+
+        case MB_FUNC_Read_Coils:
+        case MB_FUNC_Read_Discrete_Inputs:
+        case MB_FUNC_Read_Holding_Registers:
+        case MB_FUNC_Read_Input_Registers:
+        case MB_FUNC_Write_Single_Coil:
+        case MB_FUNC_Write_Single_Register:
+            v->n=8;
+            v->t=MB_RTU_TYPE_FIX;
+            break;
+        case MB_FUNC_Encapsulated_Interface:
+            v->n=7;
+            v->t=MB_RTU_TYPE_FIX;
+            break;
+
+        case MB_FUNC_Read_Exception_Status:
+        case MB_FUNC_Report_Server_ID:
+            v->n=4;
+            v->t=MB_RTU_TYPE_FIX;
+            break;
+#endif
+        default:
+            v->n=0;
+            v->t=MB_RTU_TYPE_NONE;
+        break;
+    }
+#if(MB_MODE==MB_MODE_MASTER)
+    if(MB_RTU_Func & 0x80)    //MB_PACKET_TYPE_ERROR
+    {
+        v->t=MB_RTU_TYPE_ERROR;
+        v->n=5;
+    }
+#endif
+}
 
 void mb_rtu_error_handler(mb_rtu_error_e err)
 {
@@ -71,227 +147,183 @@ void mb_rtu_reset_rx_buffer(void)
 
 void mb_rtu_check_new_data(uint8_t oneByte)
 {
-    #if(MB_MODE==MB_MODE_MASTER)
+    static mb_rtu_clen_s clen;
 
-        if(!MB_RTU_Rx_Buffer_Index) //Device Address
-        {
-            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-            MB_RTU_Rx_Buffer_Index++;
-        }else if(MB_RTU_Rx_Buffer_Index==1) //Func
-        {
-            MB_RTU_Func=oneByte;
-            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-            MB_RTU_Rx_Buffer_Index++;
-        }
-        else if(MB_RTU_Func & 0x80)    //MB_PACKET_TYPE_ERROR
-        {
-            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-            MB_RTU_Rx_Buffer_Index++;
+#if(MB_MODE==MB_MODE_MASTER)
 
-            if(MB_RTU_Rx_Buffer_Index>=5)
+    if(!MB_RTU_Rx_Buffer_Index) //Device Address
+    {
+        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+        MB_RTU_Rx_Buffer_Index++;
+    }else if(MB_RTU_Rx_Buffer_Index==1) //Func
+    {
+        MB_RTU_Func=oneByte;
+        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+        MB_RTU_Rx_Buffer_Index++;
+        mb_rtu_clen(&clen,MB_RTU_Func);
+    }
+    else 
+    {
+        if(clen.t==MB_RTU_TYPE_VAR)
+        {
+            if(MB_RTU_Rx_Buffer_Index==clen.n)
             {
-                if(mb_crc_check(MB_RTU_Rx_Buffer,5)==MB_CRC_OK)
+                if(oneByte>MB_RTU_Rx_MDBL)
+                {
+                    mb_rtu_error_handler(MB_RTU_ERROR_Data_Size);
+                    mb_rtu_reset_rx_buffer();
+                }
+                else
+                {
+                    MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+                    MB_RTU_Rx_Buffer_Index++;
+                    MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
+                }
+            }
+            else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
+            {
+                MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+                MB_RTU_Rx_Buffer_Index++;
+                if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
+                {
+                    if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
+                    {
+                        //OK -> Remove CRC & Go!
+                        mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
+                    }
+                    else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
+                    mb_rtu_reset_rx_buffer();
+                }
+            }
+        }
+        else if(clen.t==MB_RTU_TYPE_FIX)
+        {
+            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+            MB_RTU_Rx_Buffer_Index++;
+
+            if(MB_RTU_Rx_Buffer_Index>=clen.n)
+            {
+                if(mb_crc_check(MB_RTU_Rx_Buffer,8)==MB_CRC_OK)
                 {
                     //OK -> Remove CRC & Go!
                     mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
                 }
                 else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
                 mb_rtu_reset_rx_buffer();
-                return;
             }
         }
-        else //check func
+        else if(clen.t==MB_RTU_TYPE_ERROR)
         {
-            switch (MB_RTU_Func)
+            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+            MB_RTU_Rx_Buffer_Index++;
+
+            if(MB_RTU_Rx_Buffer_Index>=clen.n)
             {
-                //Slave Res VAR
-                case MB_FUNC_Read_Coils:
-                case MB_FUNC_Read_Discrete_Inputs:
-                case MB_FUNC_Read_Holding_Registers:
-                case MB_FUNC_Read_Input_Registers:
-                    if(MB_RTU_Rx_Buffer_Index==2) //Size of Data Bytes
-                    {
-                        if(oneByte>MB_RTU_Rx_MDBL)
-                        {
-                            mb_rtu_error_handler(MB_RTU_ERROR_Data_Size);
-                            mb_rtu_reset_rx_buffer();
-                            return;
-                        }
-                        else
-                        {
-                            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                            MB_RTU_Rx_Buffer_Index++;
-                            MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
-                        }
-                    }else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
-                    {
-                        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                        MB_RTU_Rx_Buffer_Index++;
-                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
-                        {
-                            if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
-                            {
-                                //OK -> Remove CRC & Go!
-                                mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                            }
-                            else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                            mb_rtu_reset_rx_buffer();
-                            return;
-                        }
-                    }
-                break;
-                
-                //Slave Res Fix
-                case MB_FUNC_Write_Single_Coil:
-                case MB_FUNC_Write_Single_Register:
-                case MB_FUNC_Write_Multiple_Coils:
-                case MB_FUNC_Write_Multiple_Registers:
-                    MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                    MB_RTU_Rx_Buffer_Index++;
-
-                    if(MB_RTU_Rx_Buffer_Index>=8)
-                    {
-                        if(mb_crc_check(MB_RTU_Rx_Buffer,8)==MB_CRC_OK)
-                        {
-                            //OK -> Remove CRC & Go!
-                            mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                        }
-                        else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                        mb_rtu_reset_rx_buffer();
-                        return;
-                    }
-                break;
-                
-                //MB Func Not Match!
-                default:
-                    mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
-                    mb_rtu_reset_rx_buffer();
-                    return;
-                break;
+                if(mb_crc_check(MB_RTU_Rx_Buffer,clen.n)==MB_CRC_OK)
+                {
+                    //OK -> Remove CRC & Go!
+                    mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
+                }
+                else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
+                mb_rtu_reset_rx_buffer();
             }
         }
-
-    #elif(MB_MODE==MB_MODE_SLAVE)
-
-        if(!MB_RTU_Rx_Buffer_Index) //Device Address
+        else
         {
-            if(mb.address==oneByte
-            #ifdef MB_SLAVE_LISTEN_BROADCAST
-            || oneByte == MB_BROADCAST_ADDRESS
-            #endif
-            )
+            //MB Func Not Match!
+            mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
+            mb_rtu_reset_rx_buffer();
+
+        }
+    }
+
+#elif(MB_MODE==MB_MODE_SLAVE)
+
+    if(!MB_RTU_Rx_Buffer_Index) //Device Address
+    {
+        if(mb.address==oneByte
+        #ifdef MB_SLAVE_LISTEN_BROADCAST
+        || oneByte == MB_BROADCAST_ADDRESS
+        #endif
+        )
+        {
+            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+            MB_RTU_Rx_Buffer_Index++;
+        }
+        else mb_rtu_error_handler(MB_RTU_ERROR_Address);
+    }
+    else if(MB_RTU_Rx_Buffer_Index==1) //Func
+    {
+        MB_RTU_Func=oneByte;
+        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+        MB_RTU_Rx_Buffer_Index++;
+        mb_rtu_clen(&clen,MB_RTU_Func);
+    }
+    else
+    {
+        if(clen.t==MB_RTU_TYPE_VAR)
+        {
+            if(MB_RTU_Rx_Buffer_Index<clen.n)
             {
                 MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                 MB_RTU_Rx_Buffer_Index++;
             }
-            else mb_rtu_error_handler(MB_RTU_ERROR_Address);
-        }
-        else if(MB_RTU_Rx_Buffer_Index==1) //Func
-        {
-            MB_RTU_Func=oneByte;
-            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-            MB_RTU_Rx_Buffer_Index++;
-        }
-        else //Check Func
-        {
-            switch (MB_RTU_Func)
+            else if(MB_RTU_Rx_Buffer_Index==clen.n)
             {
-                //Master request var
-                case MB_FUNC_Write_Multiple_Coils:
-                case MB_FUNC_Write_Multiple_Registers:
-                case MB_FUNC_Read_Write_Multiple_Registers:
-                    if(MB_RTU_Rx_Buffer_Index<((MB_RTU_Func==0x17)?10:6))
-                    {
-                        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                        MB_RTU_Rx_Buffer_Index++;
-                    }
-                    else if(MB_RTU_Rx_Buffer_Index==((MB_RTU_Func==0x17)?10:6))
-                    {
-                        if(oneByte>MB_RTU_Rx_MDBL)
-                        {
-                            mb_rtu_error_handler(MB_RTU_ERROR_Data_Size);
-                            mb_rtu_reset_rx_buffer();
-                            return;
-                        }
-                        else
-                        {
-                            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                            MB_RTU_Rx_Buffer_Index++;
-                            MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
-                        }
-                    }
-                    else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
-                    {
-                        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                        MB_RTU_Rx_Buffer_Index++;
-                        if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
-                        {
-                            if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
-                            {
-                                //OK -> Remove CRC & Go!
-                                mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                            }
-                            else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                            mb_rtu_reset_rx_buffer();
-                            return;
-                        }
-                    }
-                
-                break;
-                //Master request fix
-                case MB_FUNC_Read_Coils:
-                case MB_FUNC_Read_Discrete_Inputs:
-                case MB_FUNC_Read_Holding_Registers:
-                case MB_FUNC_Read_Input_Registers:
-                case MB_FUNC_Write_Single_Coil:
-                case MB_FUNC_Write_Single_Register:
-                case MB_FUNC_Encapsulated_Interface:
-                    {
-                        MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
-                        MB_RTU_Rx_Buffer_Index++;
-
-                        if(MB_RTU_Rx_Buffer_Index>=((MB_RTU_Func==0x2B)?7:8))
-                        {
-                            if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
-                            {
-                                //OK -> Remove CRC & Go!
-                                mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                            }
-                            else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                            mb_rtu_reset_rx_buffer();
-                            return;
-                        }
-                    }
-                break;
-
-                //Just Func
-                case MB_FUNC_Read_Exception_Status:
-                case MB_FUNC_Report_Server_ID:
+                if(oneByte>MB_RTU_Rx_MDBL)
+                {
+                    mb_rtu_error_handler(MB_RTU_ERROR_Data_Size);
+                    mb_rtu_reset_rx_buffer();
+                }
+                else
+                {
                     MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                     MB_RTU_Rx_Buffer_Index++;
-                    if(MB_RTU_Rx_Buffer_Index>=4)
-                    {
-                        if(mb_crc_check(MB_RTU_Rx_Buffer,4)==MB_CRC_OK)
-                        {
-                            //OK -> Remove CRC & Go!
-                            mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
-                        }
-                        else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
-                        mb_rtu_reset_rx_buffer();
-                        return;
-                    }
-                break;
-            
-                default:
-                //MB Func Not Match!
-                mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
-                mb_rtu_reset_rx_buffer();
-                return;
-                break;
+                    MB_RTU_Loop_C=(uint8_t)(oneByte+MB_RTU_Rx_Buffer_Index+2);
+                }
             }
-
+            else if((MB_RTU_Loop_C > MB_RTU_Rx_Buffer_Index) && MB_RTU_Loop_C) //Data + CRC
+            {
+                MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+                MB_RTU_Rx_Buffer_Index++;
+                if(MB_RTU_Loop_C == MB_RTU_Rx_Buffer_Index) //Data Ready
+                {
+                    if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
+                    {
+                        //OK -> Remove CRC & Go!
+                        mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
+                    }
+                    else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
+                    mb_rtu_reset_rx_buffer();
+                }
+            }
         }
-    #endif
+        else if(clen.t==MB_RTU_TYPE_FIX)
+        {
+            MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
+            MB_RTU_Rx_Buffer_Index++;
+
+            if(MB_RTU_Rx_Buffer_Index>=clen.n)
+            {
+                if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
+                {
+                    //OK -> Remove CRC & Go!
+                    mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
+                }
+                else mb_rtu_error_handler(MB_RTU_ERROR_CRC);
+                mb_rtu_reset_rx_buffer();
+            }
+        }
+        else
+        {
+            //MB Func Not Match!
+            mb_rtu_error_handler(MB_RTU_ERROR_FUNC);
+            mb_rtu_reset_rx_buffer();
+        }
+    }
+
+#endif
+
 }
 
 mb_packet_s mb_rtu_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Len)

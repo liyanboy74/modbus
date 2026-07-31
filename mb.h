@@ -145,7 +145,6 @@ uint8_t         mb_slave_status_get(void);								    // Get Slave status
 
 void            mb_slave_set_server_id(uint8_t id);                         // Set Server id
 
-
 void            mb_error_handler(mb_packet_s* Packet,mb_error_e err);		// Make and Send ERROR Packet in Slave Mode
 
 // If Defined Mode as Master
@@ -159,7 +158,6 @@ void            mb_set_tx_handler(void (*f)(uint8_t *,uint16_t));			// Set Callb
 
 void            mb_rx_packet_handler(mb_packet_s Packet);					// Start Processing Received Packet
 void            mb_tx_packet_handler(mb_packet_s Packet);					// Prepare and Send Packet
-
 
 #ifdef __cplusplus
 }
