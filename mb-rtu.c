@@ -14,7 +14,7 @@ uint8_t MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Size];
 uint8_t MB_RTU_Rx_Buffer_Index=0,MB_RTU_Loop_C=0,MB_RTU_Func=0;
 mb_rtu_error_e MB_RTU_Status=MB_RTU_OK;
 
-static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
+static void mb_rtu_get_rx_info(mb_rtu_info_s *v,uint8_t f)
 {
     switch ((mb_function_e)f)
     {
@@ -43,7 +43,6 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
             v->index=10;
             v->type=MB_RTU_TYPE_VAR;
             break;
-
         case MB_FUNC_Read_Coils:
         case MB_FUNC_Read_Discrete_Inputs:
         case MB_FUNC_Read_Holding_Registers:
@@ -57,7 +56,10 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
             v->index=7;
             v->type=MB_RTU_TYPE_FIX;
             break;
-
+        case MB_FUNC_Mask_Write_Register:
+            v->index=10;
+            v->type=MB_RTU_TYPE_FIX;
+            break;
         case MB_FUNC_Read_Exception_Status:
         case MB_FUNC_Report_Server_ID:
             v->index=4;
@@ -134,7 +136,7 @@ void mb_rtu_reset_rx_buffer(void)
 
 void mb_rtu_check_new_data(uint8_t oneByte)
 {
-    static mb_rtu_clen_s clen;
+    static mb_rtu_info_s info;
 
     if(!MB_RTU_Rx_Buffer_Index) //Device Address
     {
@@ -159,18 +161,18 @@ void mb_rtu_check_new_data(uint8_t oneByte)
         MB_RTU_Func=oneByte;
         MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
         MB_RTU_Rx_Buffer_Index++;
-        mb_rtu_clen(&clen,MB_RTU_Func);
+        mb_rtu_get_rx_info(&info,MB_RTU_Func);
     }
     else 
     {
-        if(clen.type==MB_RTU_TYPE_VAR)
+        if(info.type==MB_RTU_TYPE_VAR)
         {
-            if(MB_RTU_Rx_Buffer_Index<clen.index)
+            if(MB_RTU_Rx_Buffer_Index<info.index)
             {
                 MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                 MB_RTU_Rx_Buffer_Index++;
             }
-            else if(MB_RTU_Rx_Buffer_Index==clen.index)
+            else if(MB_RTU_Rx_Buffer_Index==info.index)
             {
                 if(oneByte>MB_RTU_Rx_MDBL)
                 {
@@ -200,12 +202,12 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 }
             }
         }
-        else if(clen.type==MB_RTU_TYPE_FIX)
+        else if(info.type==MB_RTU_TYPE_FIX)
         {
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
 
-            if(MB_RTU_Rx_Buffer_Index>=clen.index)
+            if(MB_RTU_Rx_Buffer_Index>=info.index)
             {
                 if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
                 {

@@ -29,7 +29,7 @@ typedef enum {
 typedef struct {
     uint8_t index;
     mb_rtu_t_e type;
-}mb_rtu_clen_s;
+}mb_rtu_info_s;
 
 
 #ifdef __cplusplus
