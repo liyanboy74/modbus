@@ -14,17 +14,7 @@ uint8_t MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Size];
 uint8_t MB_RTU_Rx_Buffer_Index=0,MB_RTU_Loop_C=0,MB_RTU_Func=0;
 mb_rtu_error_e MB_RTU_Status=MB_RTU_OK;
 
-typedef enum {
-    MB_RTU_TYPE_VAR,
-    MB_RTU_TYPE_FIX,
-    MB_RTU_TYPE_ERROR,
-    MB_RTU_TYPE_NONE
-}mb_rtu_t_e;
 
-typedef struct {
-    uint8_t n;          //Index
-    mb_rtu_t_e t;       //Type
-}mb_rtu_clen_s;
 
 static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
 {
@@ -35,26 +25,26 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
         case MB_FUNC_Read_Discrete_Inputs:
         case MB_FUNC_Read_Holding_Registers:
         case MB_FUNC_Read_Input_Registers:
-            v->n=2;
-            v->t=MB_RTU_TYPE_VAR;
+            v->index=2;
+            v->type=MB_RTU_TYPE_VAR;
             break;
         case MB_FUNC_Write_Single_Coil:
         case MB_FUNC_Write_Single_Register:
         case MB_FUNC_Write_Multiple_Coils:
         case MB_FUNC_Write_Multiple_Registers:
-            v->n=8;
-            v->t=MB_RTU_TYPE_FIX;
+            v->index=8;
+            v->type=MB_RTU_TYPE_FIX;
             break;
 #elif(MB_MODE==MB_MODE_SLAVE)
         
         case MB_FUNC_Write_Multiple_Coils:
         case MB_FUNC_Write_Multiple_Registers:
-            v->n=6;
-            v->t=MB_RTU_TYPE_VAR;
+            v->index=6;
+            v->type=MB_RTU_TYPE_VAR;
             break;
         case MB_FUNC_Read_Write_Multiple_Registers:
-            v->n=10;
-            v->t=MB_RTU_TYPE_VAR;
+            v->index=10;
+            v->type=MB_RTU_TYPE_VAR;
             break;
 
         case MB_FUNC_Read_Coils:
@@ -63,30 +53,30 @@ static void mb_rtu_clen(mb_rtu_clen_s *v,uint8_t f)
         case MB_FUNC_Read_Input_Registers:
         case MB_FUNC_Write_Single_Coil:
         case MB_FUNC_Write_Single_Register:
-            v->n=8;
-            v->t=MB_RTU_TYPE_FIX;
+            v->index=8;
+            v->type=MB_RTU_TYPE_FIX;
             break;
         case MB_FUNC_Encapsulated_Interface:
-            v->n=7;
-            v->t=MB_RTU_TYPE_FIX;
+            v->index=7;
+            v->type=MB_RTU_TYPE_FIX;
             break;
 
         case MB_FUNC_Read_Exception_Status:
         case MB_FUNC_Report_Server_ID:
-            v->n=4;
-            v->t=MB_RTU_TYPE_FIX;
+            v->index=4;
+            v->type=MB_RTU_TYPE_FIX;
             break;
 #endif
         default:
-            v->n=0;
-            v->t=MB_RTU_TYPE_NONE;
+            v->index=0;
+            v->type=MB_RTU_TYPE_NONE;
         break;
     }
 #if(MB_MODE==MB_MODE_MASTER)
     if(MB_RTU_Func & 0x80)    //MB_PACKET_TYPE_ERROR
     {
-        v->t=MB_RTU_TYPE_ERROR;
-        v->n=5;
+        v->type=MB_RTU_TYPE_ERROR;
+        v->index=5;
     }
 #endif
 }
@@ -164,9 +154,9 @@ void mb_rtu_check_new_data(uint8_t oneByte)
     }
     else 
     {
-        if(clen.t==MB_RTU_TYPE_VAR)
+        if(clen.type==MB_RTU_TYPE_VAR)
         {
-            if(MB_RTU_Rx_Buffer_Index==clen.n)
+            if(MB_RTU_Rx_Buffer_Index==clen.index)
             {
                 if(oneByte>MB_RTU_Rx_MDBL)
                 {
@@ -196,12 +186,12 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 }
             }
         }
-        else if(clen.t==MB_RTU_TYPE_FIX)
+        else if(clen.type==MB_RTU_TYPE_FIX)
         {
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
 
-            if(MB_RTU_Rx_Buffer_Index>=clen.n)
+            if(MB_RTU_Rx_Buffer_Index>=clen.index)
             {
                 if(mb_crc_check(MB_RTU_Rx_Buffer,8)==MB_CRC_OK)
                 {
@@ -212,14 +202,14 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 mb_rtu_reset_rx_buffer();
             }
         }
-        else if(clen.t==MB_RTU_TYPE_ERROR)
+        else if(clen.type==MB_RTU_TYPE_ERROR)
         {
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
 
-            if(MB_RTU_Rx_Buffer_Index>=clen.n)
+            if(MB_RTU_Rx_Buffer_Index>=clen.index)
             {
-                if(mb_crc_check(MB_RTU_Rx_Buffer,clen.n)==MB_CRC_OK)
+                if(mb_crc_check(MB_RTU_Rx_Buffer,clen.index)==MB_CRC_OK)
                 {
                     //OK -> Remove CRC & Go!
                     mb_rx_packet_handler(mb_rtu_rx_packet_split(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index-2));
@@ -261,14 +251,14 @@ void mb_rtu_check_new_data(uint8_t oneByte)
     }
     else
     {
-        if(clen.t==MB_RTU_TYPE_VAR)
+        if(clen.type==MB_RTU_TYPE_VAR)
         {
-            if(MB_RTU_Rx_Buffer_Index<clen.n)
+            if(MB_RTU_Rx_Buffer_Index<clen.index)
             {
                 MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
                 MB_RTU_Rx_Buffer_Index++;
             }
-            else if(MB_RTU_Rx_Buffer_Index==clen.n)
+            else if(MB_RTU_Rx_Buffer_Index==clen.index)
             {
                 if(oneByte>MB_RTU_Rx_MDBL)
                 {
@@ -298,12 +288,12 @@ void mb_rtu_check_new_data(uint8_t oneByte)
                 }
             }
         }
-        else if(clen.t==MB_RTU_TYPE_FIX)
+        else if(clen.type==MB_RTU_TYPE_FIX)
         {
             MB_RTU_Rx_Buffer[MB_RTU_Rx_Buffer_Index]=oneByte;
             MB_RTU_Rx_Buffer_Index++;
 
-            if(MB_RTU_Rx_Buffer_Index>=clen.n)
+            if(MB_RTU_Rx_Buffer_Index>=clen.index)
             {
                 if(mb_crc_check(MB_RTU_Rx_Buffer,MB_RTU_Rx_Buffer_Index)==MB_CRC_OK)
                 {

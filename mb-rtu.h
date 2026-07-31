@@ -20,6 +20,19 @@ typedef enum{
     MB_RTU_ERROR_FUNC
 }mb_rtu_error_e;
 
+typedef enum {
+    MB_RTU_TYPE_VAR,
+    MB_RTU_TYPE_FIX,
+    MB_RTU_TYPE_ERROR,
+    MB_RTU_TYPE_NONE
+}mb_rtu_t_e;
+
+typedef struct {
+    uint8_t index;
+    mb_rtu_t_e type;
+}mb_rtu_clen_s;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
