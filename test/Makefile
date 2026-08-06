@@ -5,11 +5,11 @@ CC = gcc
 DEFINES =
 
 WARN = -std=c99 \
-       -Wall -Wextra -Wpedantic \
-       -Wconversion -Wsign-conversion \
-       -Wshadow -Wformat=2 \
-       -Wundef -Wstrict-prototypes \
-       -Wmissing-prototypes
+	-Wall -Wextra -Wpedantic \
+	-Wconversion -Wsign-conversion \
+	-Wshadow -Wformat=2 \
+	-Wundef -Wstrict-prototypes \
+	-Wmissing-prototypes
 
 INC = -I..
 
@@ -52,8 +52,11 @@ client:
 	$(CC) $(WARN) -DMB_MODE=MB_MODE_MASTER test-tcp-client.c \
 	$(SRC_MASTER) $(SRC_TCP) $(INC) $(DEFINES) -o client
 
+server-rtu:
+	$(CC) $(WARN) -DMB_MODE=MB_MODE_SLAVE test-rtu-over-tcp-server.c \
+	$(SRC_SLAVE) $(SRC_RTU) $(INC) $(DEFINES) -o server-rtu
 
-test: slave master server client
+test: slave master server client server-rtu
 
 clean:
-	rm -rf *.o *.exe slave master server client
+	rm -rf *.o *.exe slave master server client server-rtu

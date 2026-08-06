@@ -5,4 +5,5 @@ server
 client
 master
 slave
+server-rtu
 
