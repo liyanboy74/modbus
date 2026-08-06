@@ -16,14 +16,14 @@
 int AnsIndex=0,AnsPIndex=0;
 
 
-void send_data_to_mb(uint8_t * Data,uint8_t Size)
-{
-    int i;
-    for(i=0;i<Size;i++)
-    {
-        mb_rx_new_data(Data[i]);
-    }
-}
+// static void send_data_to_mb(uint8_t * Data,uint8_t Size)
+// {
+//     int i;
+//     for(i=0;i<Size;i++)
+//     {
+//         mb_rx_new_data(Data[i]);
+//     }
+// }
 
 const uint8_t SlaveAns[TestNum][9]={
     {0x01,0x05,0x00,0x00,0xff,0x00,0x8c,0x3a},
@@ -51,14 +51,14 @@ const uint8_t MasterReq[TestNum][11]={
     {0x01,0x03,0x00,0x01,0x00,0x01,0xd5,0xca},
 };
 
-void bar()
+static void bar(void)
 {
     int i;
     for(i=0;i<50;i++)putchar('=');
     printf("\n");
 }
 
-uint8_t datacmp(const uint8_t* Data1,const uint8_t* Data2,uint16_t Len)
+static uint8_t datacmp(const uint8_t* Data1,const uint8_t* Data2,uint16_t Len)
 {
     uint16_t i;
     for(i=0;i<Len;i++)
@@ -69,7 +69,7 @@ uint8_t datacmp(const uint8_t* Data1,const uint8_t* Data2,uint16_t Len)
 }
 
 int MPIndex=0;
-void master_process(mb_packet_s Packet)
+static void master_process(mb_packet_s Packet)
 {
     int i;
     printf("MP: %02x %02x ",Packet.unit_id,Packet.function);
@@ -82,7 +82,7 @@ void master_process(mb_packet_s Packet)
     MPIndex++;
 }
 
-void send_data(uint8_t *Data,uint16_t Len)
+static void send_data(uint8_t *Data,uint16_t Len)
 {
     int i;
     printf("TX: ");

@@ -16,7 +16,7 @@
 
 static int client_fd;
 
-void send_data(uint8_t *data, uint16_t len)
+static void send_data(uint8_t *data, uint16_t len)
 {
     send(client_fd, data, len, 0);
 
@@ -82,7 +82,7 @@ int main(void)
         while(1)
         {
             int len;
-            len = recv(client_fd,
+            len = (int)recv(client_fd,
                        rx_buffer,
                        sizeof(rx_buffer),
                        0);
@@ -101,7 +101,7 @@ int main(void)
                 printf("\n");
             #endif
 
-            mb_tcp_receive(rx_buffer,len);
+            mb_tcp_receive(rx_buffer,(uint16_t)len);
         }
     }
     close(server_fd);

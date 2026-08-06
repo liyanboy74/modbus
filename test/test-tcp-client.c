@@ -16,7 +16,7 @@
 
 static int sockfd;
 
-void send_data(uint8_t *data, uint16_t len)
+static void send_data(uint8_t *data, uint16_t len)
 {
     send(sockfd, data, len, 0);
 
@@ -28,7 +28,7 @@ void send_data(uint8_t *data, uint16_t len)
     #endif
 }
 
-void master_process(mb_packet_s Packet)
+static void master_process(mb_packet_s Packet)
 {
     #ifdef TEST_TCP_DEBUG
         printf("RX Function: %02X\n", Packet.function);
@@ -65,7 +65,7 @@ int main(void)
     {
         mb_tx_packet_handler(mb_packet_request_read_holding_registers(1,0,10));
 
-        int len = recv(sockfd,
+        int len = (int)recv(sockfd,
                        rx_buffer,
                        sizeof(rx_buffer),
                        0);
