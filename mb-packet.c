@@ -14,7 +14,8 @@ uint8_t MB_PACKET_Buffer[MB_PACKET_Buffer_Size];
 mb_packet_s mb_packet_type_master_request_var(mb_function_e function,uint8_t DeviceAddress,uint16_t StartAd,uint16_t Quantity,uint8_t len,uint8_t *Data)
 {
 	int i;
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.unit_id=DeviceAddress;
 	Packet.function= function;
 	Packet.length= 5+len;
@@ -30,7 +31,8 @@ mb_packet_s mb_packet_type_master_request_var(mb_function_e function,uint8_t Dev
 
 mb_packet_s mb_packet_type_master_request_fix(mb_function_e function,uint8_t DeviceAddress,uint16_t w1,uint16_t w2)
 {
-	mb_packet_s Packet={.payload=MB_PACKET_Buffer};
+	mb_packet_s Packet;
+	Packet.payload=MB_PACKET_Buffer;
 	Packet.unit_id=DeviceAddress;
 	Packet.function= function;
 	Packet.length=4;
