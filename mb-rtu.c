@@ -80,7 +80,7 @@ static void mb_rtu_get_rx_info(mb_rtu_info_s *v,uint8_t f)
     #endif
 }
 
-void mb_rtu_error_handler(mb_rtu_error_e err)
+static void mb_rtu_error_handler(mb_rtu_error_e err)
 {
     MB_RTU_Status=err;
     #ifdef MB_RTU_DEBUG
@@ -104,7 +104,7 @@ void mb_rtu_send(uint8_t *Data,uint8_t Len)
     mb.tx_handler(Data,Len);
 }
 
-void mb_rtu_prepare_tx_data(mb_packet_s Packet)
+static void mb_rtu_prepare_tx_data(mb_packet_s Packet)
 {
     uint8_t i;
 
@@ -132,6 +132,17 @@ void mb_rtu_reset_rx_buffer(void)
         MB_RTU_Loop_C=0;
         MB_RTU_Func=0;
     }
+}
+
+static mb_packet_s mb_rtu_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Len)
+{
+    mb_packet_s Packet;
+
+    Packet.unit_id=Packet_Buffer[0];
+    Packet.function=(mb_function_e)Packet_Buffer[1];
+    Packet.length=Len-2;//remove unit_id & function
+    Packet.payload=&Packet_Buffer[2];
+    return Packet;
 }
 
 void mb_rtu_check_new_data(uint8_t oneByte)
@@ -225,17 +236,6 @@ void mb_rtu_check_new_data(uint8_t oneByte)
             mb_rtu_reset_rx_buffer();
         }
     }
-}
-
-mb_packet_s mb_rtu_rx_packet_split(uint8_t *Packet_Buffer,uint8_t Len)
-{
-    mb_packet_s Packet;
-
-    Packet.unit_id=Packet_Buffer[0];
-    Packet.function=(mb_function_e)Packet_Buffer[1];
-    Packet.length=Len-2;//remove unit_id & function
-    Packet.payload=&Packet_Buffer[2];
-    return Packet;
 }
 
 //RTU Transport

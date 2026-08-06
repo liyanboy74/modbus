@@ -49,7 +49,7 @@ void mb_tcp_receive(uint8_t *Data, uint16_t Len)
     mb_rx_packet_handler(Packet);
 }
 
-void mb_tcp_prepare_tx_data(mb_packet_s Packet)
+static void mb_tcp_prepare_tx_data(mb_packet_s Packet)
 {
     uint16_t len;
 

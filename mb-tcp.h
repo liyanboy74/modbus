@@ -20,7 +20,6 @@ extern "C" {
 #endif
 
 void mb_tcp_receive(uint8_t *Data, uint16_t Len);
-void mb_tcp_prepare_tx_data(mb_packet_s Packet);
 void mb_tcp_send(uint8_t *Data, uint16_t Len);
 
 // TCP Transport
